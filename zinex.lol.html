@@ -47,13 +47,13 @@ img.logo {
     cursor: pointer;
 }
 
-/* ---------------------- COUNTDOWN ---------------------- */
-#countdown-wrapper {
+/* ---------------------- CLOCK ---------------------- */
+#clock-wrapper {
     position: relative;
     display: inline-block;
 }
 
-#countdown {
+#clock {
     font-size: 36px;
     letter-spacing: 2px;
     margin: -10px 0 20px 0;
@@ -61,21 +61,16 @@ img.logo {
     position: relative;
     z-index: 10;
     text-shadow: 0 0 15px rgba(255,150,200,0.8);
+    font-family: 'ContinuumMedium', monospace;
 }
 
-#countdown::after {
-    content: "";
+#clock::after {
+    content: "🕒";
     position: absolute;
     right: -60px;
     top: -10px;
     font-size: 24px;
     animation: blossomFloat 3s ease-in-out infinite;
-}
-
-@keyframes blossomFloat {
-    0% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-8px) rotate(8deg); }
-    100% { transform: translateY(0) rotate(0); }
 }
 
 /* ---------------------- PANELS ---------------------- */
@@ -211,8 +206,8 @@ img.logo {
 <img src="zinex.lol_files/zendex.png" class="logo" alt="Zendex Logo">
 <h1>woooooooooooooooow</h1>
 
-<div id="countdown-wrapper">
-    <div id="countdown">00:00:00</div>
+<div id="clock-wrapper">
+    <div id="clock">--:--:--</div>
 </div>
 
 <img id="usagi" src="zinex.lol_files/zinex.gif" class="slide-down">
@@ -291,35 +286,58 @@ function spawnFallingPeam() {
 }
 
 /* ----------------------------------------------------------
-   BLOSSOMS BEHIND COUNTDOWN
+   REAL-TIME CLOCK
+----------------------------------------------------------- */
+function updateClock() {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0'); 
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    
+    const clock = document.getElementById("clock");
+    if (clock) {
+        clock.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+}
+
+// Обновляем часы каждую секунду
+setInterval(updateClock, 1000);
+updateClock(); // Запускаем сразу
+
+/* ----------------------------------------------------------
+   CLICK CLOCK = FALLING PEAM BURST (оставляем эту анимацию!)
+----------------------------------------------------------- */
+document.addEventListener('DOMContentLoaded', function() {
+    const clock = document.getElementById("clock");
+    if (clock) {
+        clock.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const burst = 6 + Math.floor(Math.random() * 5);
+            for (let i = 0; i < burst; i++) {
+                setTimeout(spawnFallingPeam, i * 120);
+            }
+        });
+    }
+});
+
+/* ----------------------------------------------------------
+   BLOSSOMS BEHIND CLOCK (цветочки теперь вокруг часов!)
 ----------------------------------------------------------- */
 function spawnBlossom() {
-    const wrapper = document.getElementById("countdown-wrapper");
+    const wrapper = document.getElementById("clock-wrapper"); // ← изменил тут!
+    if (!wrapper) return;
+    
     const blossom = document.createElement("div");
     blossom.className = "blossom";
-
     const emojis = ["🌺","🌸","🌿","🌼","🍃"];
     blossom.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-
     blossom.style.left = (Math.random() * wrapper.offsetWidth) + "px";
     blossom.style.top = "-20px";
     blossom.style.animation = "blossomFall 4s linear forwards";
-
     wrapper.appendChild(blossom);
     setTimeout(() => blossom.remove(), 4000);
 }
 setInterval(spawnBlossom, 1300);
-
-/* ----------------------------------------------------------
-   CLICK COUNTDOWN = FALLING PEAM BURST
------------------------------------------------------------ */
-countdownText.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const burst = 6 + Math.floor(Math.random() * 5);
-    for (let i = 0; i < burst; i++) {
-        setTimeout(spawnFallingPeam, i * 120);
-    }
-});
 /* --- credits: usagi --- */
 </script>
 
