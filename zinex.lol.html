@@ -286,26 +286,7 @@ function spawnFallingPeam() {
 }
 
 /* ----------------------------------------------------------
-   REAL-TIME CLOCK
------------------------------------------------------------ */
-function updateClock() {
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0'); 
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    
-    const clock = document.getElementById("clock");
-    if (clock) {
-        clock.textContent = `${hours}:${minutes}:${seconds}`;
-    }
-}
-
-// 
-setInterval(updateClock, 1000);
-updateClock(); 
-
-/* ----------------------------------------------------------
-   NEW YEAR COUNTDOWN
+   NEW YEAR COUNTDOWN ()
 ----------------------------------------------------------- */
 function updateNewYearCountdown() {
     const now = new Date();
@@ -319,21 +300,26 @@ function updateNewYearCountdown() {
         return;
     }
     
+    
     const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
     const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
     
+    
     const countdownText = `${days}д ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     
-    document.getElementById("countdown").textContent = countdownText;
+    const countdown = document.getElementById("countdown");
+    if (countdown) {
+        countdown.textContent = countdownText;
+    }
 }
 
-updateNewYearCountdown();
 setInterval(updateNewYearCountdown, 1000);
+updateNewYearCountdown(); 
 
 /* ----------------------------------------------------------
-   CLICK COUNTDOWN = FALLING PEAM BURST
+   CLICK COUNTDOWN = FALLING PEAM BURST ()
 ----------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', function() {
     const countdown = document.getElementById("countdown");
@@ -349,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ----------------------------------------------------------
-   BLOSSOMS BEHIND COUNTDOWN (neeew yeaaar)
+   BLOSSOMS BEHIND COUNTDOWN (new year)
 ----------------------------------------------------------- */
 function spawnBlossom() {
     const wrapper = document.getElementById("countdown-wrapper");
@@ -358,14 +344,12 @@ function spawnBlossom() {
     const blossom = document.createElement("div");
     blossom.className = "blossom";
     
-    
-    const emojis = ["🎄","🎅","🌟","❄️","🎁","🕯️","✨","🎉"];
+    const emojis = ["⛄","🎄","🌨️","☃️","❄️","🎁","✨","🌟"];
     blossom.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     
     blossom.style.left = (Math.random() * wrapper.offsetWidth) + "px";
     blossom.style.top = "-20px";
     blossom.style.animation = "blossomFall 4s linear forwards";
-    blossom.style.fontSize = "24px";
     
     wrapper.appendChild(blossom);
     setTimeout(() => blossom.remove(), 4000);
