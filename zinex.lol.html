@@ -39,19 +39,45 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* ---------------------- LOGO ---------------------- */
-img.logo {
+/* ---------------------- 3D LOGO ---------------------- */
+.interactive-logo {
     width: 250px;
+    height: 250px; 
     max-width: 70%;
     margin-bottom: 15px;
     cursor: pointer;
+    
+    border-radius: 50%;
+    object-fit: cover;
+    
+    will-change: transform;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    border: 3px solid #73b7ff; 
+    box-shadow: 
+        0 0 20px rgba(115, 183, 255, 0.4),
+        inset 0 0 20px rgba(115, 183, 255, 0.2); 
+    padding: 8px; 
+    background: rgba(26, 26, 26, 0.8);
 }
 
-/* ---------------------- COUNTDOWN ---------------------- */
+.interactive-logo:hover {
+    transform: translateY(-8px) scale(1.08) rotateY(5deg);
+    box-shadow: 
+        0 15px 35px rgba(115, 183, 255, 0.6),
+        inset 0 0 25px rgba(115, 183, 255, 0.3);
+    border-color: #4a90e2; 
+}
+
+.interactive-logo:active {
+    transform: translateY(-2px) scale(0.98);
+    transition: transform 0.1s ease;
+}
+/* ---------------------- 3D COUNTDOWN ---------------------- */
 #countdown-wrapper {
     position: relative;
     display: inline-block;
-    margin: 20px 0;
+    perspective: 1000px;
 }
 
 #countdown {
@@ -63,13 +89,29 @@ img.logo {
     z-index: 10;
     text-shadow: 0 0 20px #ff00cc, 
                  0 0 30px #ff0066,
-                 0 0 50px #ff0000,
-                 0 0 60px #ff0088; 
+                 0 0 50px #ff0000;
     font-family: 'ContinuumMedium', monospace;
-    color: #ffffff; 
-    padding: 10px 20px;
+    color: #ffffff;
+    padding: 15px 25px;
     border-radius: 15px;
-    background: rgba(0, 0, 0, 0.3); 
+    background: rgba(0, 0, 0, 0.3);
+    
+    /* ★★★ 3D EFFECT ★★★ */
+    will-change: transform;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    border: 2px solid #ff00cc;
+    box-shadow: 0 0 25px rgba(255, 0, 204, 0.4);
+}
+
+#countdown:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 10px 30px rgba(255, 0, 204, 0.6);
+}
+
+#countdown:active {
+    transform: translateY(0px) scale(0.95);
+    transition: transform 0.1s ease;
 }
 
 #countdown::after {
@@ -80,33 +122,6 @@ img.logo {
     font-size: 32px;
     animation: blossomFloat 3s ease-in-out infinite;
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
-    text-shadow: 0 0 15px rgba(255,255,255,0.9);
-}
-
-@keyframes blossomFloat {
-    0% { transform: translateY(0) rotate(0) scale(1); }
-    50% { transform: translateY(-12px) rotate(10deg) scale(1.1); }
-    100% { transform: translateY(0) rotate(0) scale(1); }
-}
-
-@keyframes glowPulse {
-    0% { 
-        text-shadow: 0 0 20px #ff00cc, 
-                     0 0 30px #ff0066;
-    }
-    50% { 
-        text-shadow: 0 0 30px #ff00cc, 
-                     0 0 50px #ff0066,
-                     0 0 70px #ff0000;
-    }
-    100% { 
-        text-shadow: 0 0 20px #ff00cc, 
-                     0 0 30px #ff0066;
-    }
-}
-
-#countdown {
-    animation: glowPulse 2s ease-in-out infinite;
 }
 
 /* ---------------------- PANELS ---------------------- */
@@ -176,19 +191,35 @@ img.logo {
     h1 { font-size: 32px; }
 }
 
-/* ---------------------- AUDIO / BUTTONS ---------------------- */
+/* ---------------------- 3D MUTE BUTTON ---------------------- */
 #muteButton {
     position: fixed;
     top: 10px;
     left: 10px;
-    background-color: rgba(0,0,0,0.6);
+    background: linear-gradient(45deg, #333, #555);
     color: #fff;
-    border: none;
-    padding: 10px 15px;
+    border: 2px solid #73b7ff;
+    padding: 12px 18px;
     cursor: pointer;
     font-size: 14px;
-    border-radius: 5px;
+    border-radius: 8px;
     z-index: 10000;
+    
+    will-change: transform;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    box-shadow: 0 0 15px rgba(115, 183, 255, 0.3);
+}
+
+#muteButton:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 5px 20px rgba(115, 183, 255, 0.5);
+    background: linear-gradient(45deg, #555, #777);
+}
+
+#muteButton:active {
+    transform: translateY(1px) scale(0.95);
+    transition: transform 0.1s ease;
 }
 
 /* ---------------------- USAGI ---------------------- */
@@ -347,11 +378,15 @@ img.logo {
 
 
 
-<img src="zinex.lol_files/zendex.png" class="logo" alt="Zendex Logo">
+<div class="tilt-container-logo">
+    <img src="zinex.lol_files/zendex.png" class="logo interactive-logo" alt="Zendex Logo">
+</div>
 <h1>woooooooooooooooow</h1>
 
-<div id="countdown-wrapper">
-    <div id="countdown">Загрузка...</div>
+<div class="tilt-container-timer">
+    <div id="countdown-wrapper">
+        <div id="countdown">00:00:00</div>
+    </div>
 </div>
 
 <!-- info -->
@@ -584,6 +619,8 @@ function init3DTilt() {
 }
 
 document.addEventListener('DOMContentLoaded', init3DTilt);
+
+
 /* --- credits: usagi --- */
 </script>
 
