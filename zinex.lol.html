@@ -47,30 +47,66 @@ img.logo {
     cursor: pointer;
 }
 
-/* ---------------------- CLOCK ---------------------- */
-#clock-wrapper {
+/* ---------------------- COUNTDOWN ---------------------- */
+#countdown-wrapper {
     position: relative;
     display: inline-block;
+    margin: 20px 0;
 }
 
-#clock {
-    font-size: 36px;
-    letter-spacing: 2px;
-    margin: -10px 0 20px 0;
+#countdown {
+    font-size: 42px;
+    letter-spacing: 3px;
+    margin: 10px 0 30px 0;
     cursor: pointer;
     position: relative;
     z-index: 10;
-    text-shadow: 0 0 15px rgba(255,150,200,0.8);
+    text-shadow: 0 0 20px #ff00cc, 
+                 0 0 30px #ff0066,
+                 0 0 50px #ff0000,
+                 0 0 60px #ff0088; 
     font-family: 'ContinuumMedium', monospace;
+    color: #ffffff; 
+    padding: 10px 20px;
+    border-radius: 15px;
+    background: rgba(0, 0, 0, 0.3); 
 }
 
-#clock::after {
-    content: "🕒";
+#countdown::after {
+    content: "🎄";
     position: absolute;
-    right: -60px;
-    top: -10px;
-    font-size: 24px;
+    right: -70px;
+    top: -5px;
+    font-size: 32px;
     animation: blossomFloat 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
+    text-shadow: 0 0 15px rgba(255,255,255,0.9);
+}
+
+@keyframes blossomFloat {
+    0% { transform: translateY(0) rotate(0) scale(1); }
+    50% { transform: translateY(-12px) rotate(10deg) scale(1.1); }
+    100% { transform: translateY(0) rotate(0) scale(1); }
+}
+
+@keyframes glowPulse {
+    0% { 
+        text-shadow: 0 0 20px #ff00cc, 
+                     0 0 30px #ff0066;
+    }
+    50% { 
+        text-shadow: 0 0 30px #ff00cc, 
+                     0 0 50px #ff0066,
+                     0 0 70px #ff0000;
+    }
+    100% { 
+        text-shadow: 0 0 20px #ff00cc, 
+                     0 0 30px #ff0066;
+    }
+}
+
+#countdown {
+    animation: glowPulse 2s ease-in-out infinite;
 }
 
 /* ---------------------- PANELS ---------------------- */
