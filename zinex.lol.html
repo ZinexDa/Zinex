@@ -371,12 +371,88 @@ h1 {
 .social-btn:hover img {
     transform: scale(1.1);
 }
+
+/* ---------------------- FULLSCREEN MUSIC OVERLAY ---------------------- */
+#musicOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    cursor: pointer;
+    transition: all 0.5s ease;
+}
+
+#musicOverlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(1.1);
+}
+
+.music-content h1 {
+    color: #ffffff;
+    font-family: 'ContinuumMedium', sans-serif;
+    font-size: 2.5rem;
+    text-align: center;
+    text-shadow: 0 0 20px #73b7ff;
+    animation: pulseText 2s ease-in-out infinite;
+    cursor: pointer;
+    filter: none !important;
+    backdrop-filter: none !important;
+}
+
+@keyframes pulseText {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.05);
+        text-shadow: 0 0 30px #ff00cc;
+    }
+}
+
+body:not(.music-started) .tilt-container-logo,
+body:not(.music-started) h1,
+body:not(.music-started) .tilt-container-timer,
+body:not(.music-started) .tilt-container {
+    opacity: 0.1; 
+    pointer-events: none;
+    filter: none !important;
+    backdrop-filter: none !important;
+}
+
+body.music-started .tilt-container-logo,
+body.music-started h1, 
+body.music-started .tilt-container-timer,
+body.music-started .tilt-container {
+    opacity: 1;
+    pointer-events: all;
+    transition: all 0.8s ease;
+    filter: none !important;
+    backdrop-filter: none !important;
+}
+
 </style>
 </head>
 
 <body>
 
+<div id="musicOverlay">
+    <div class="music-content">
+        <h1>click to play music</h1>
+    </div>
+</div>
 
+<audio id="bgm" loop>
+    <source src="zinex.lol_files/background-music.mp3" type="audio/mpeg">
+</audio>
 
 <div class="tilt-container-logo">
     <img src="zinex.lol_files/zendex.png" class="logo interactive-logo" alt="Zendex Logo">
@@ -435,57 +511,106 @@ h1 {
 
 <script>
 /* ----------------------------------------------------------
-   AUDIO + CHIRPS
+   audio
 ----------------------------------------------------------- */
+const musicOverlay = document.getElementById("musicOverlay");
 const bgm = document.getElementById("bgm");
-const muteButton = document.getElementById("muteButton");
-const usagi = document.getElementById("usagi");
-const countdownText = document.getElementById("countdown");
+
+musicOverlay.style.display = 'flex';
 
 const chirps = [
     new Audio("chirper1.ogg"),
-    new Audio("chirper2.ogg"),
+    new Audio("chirper2.ogg"), 
     new Audio("chirper3.ogg")
 ];
 
-chirps.forEach(c => { c.preload = "auto"; });
+chirps.forEach(c => { 
+    c.preload = "auto"; 
+    c.volume = 0.7;
+});
 
-function enableAudioOnce() {
-    bgm.muted = false;
-    bgm.volume = 1.0;
-    bgm.play();
-    document.removeEventListener("click", enableAudioOnce);
-}
-document.addEventListener("click", enableAudioOnce, { once: true });
+musicOverlay.addEventListener('click', function() {
+    console.log("starting");
 
-muteButton.addEventListener("click", () => {
-    bgm.muted = !bgm.muted;
-    muteButton.textContent = bgm.muted ? "🔇" : "🔈";
+    this.style.display = 'none';
+
+    document.body.classList.add("music-started");
+    
+    if (bgm) {
+        bgm.volume = 0.5;
+        bgm.play().then(() => {
+            console.log("music started wooww");
+        }).catch(error => {
+            console.log("error music", error);
+            // Показываем ошибку пользователю
+            const errorMsg = document.createElement('div');
+            errorMsg.innerHTML = '❌ Music error - file not found';
+            errorMsg.style.cssText = 'position:fixed; top:10px; left:10px; background:red; color:white; padding:10px; z-index:100001;';
+            document.body.appendChild(errorMsg);
+            setTimeout(() => errorMsg.remove(), 3000);
+        });
+    }
 });
 
 /* ----------------------------------------------------------
    USAGI POP-UP
 ----------------------------------------------------------- */
-document.querySelector(".logo").addEventListener("click", () => {
-    usagi.classList.remove("slide-down");
-    usagi.classList.add("slide-up");
+const usagi = document.getElementById("usagi");
 
-    const chirp = chirps[Math.floor(Math.random() * chirps.length)];
-    chirp.currentTime = 0;
-    chirp.play().catch(()=>{});
+if (usagi) {
+    document.querySelector(".interactive-logo").addEventListener("click", function() {
+        if (!document.body.classList.contains('music-started')) return;
+        
+        usagi.classList.remove("slide-down");
+        usagi.classList.add("slide-up");
 
-    setTimeout(() => {
-        usagi.classList.remove("slide-up");
-        usagi.classList.add("slide-down");
-    }, 4000);
-});
+        const chirp = chirps[Math.floor(Math.random() * chirps.length)];
+        chirp.currentTime = 0;
+        chirp.play().catch(() => {});
+
+        setTimeout(() => {
+            usagi.classList.remove("slide-up");
+            usagi.classList.add("slide-down");
+        }, 4000);
+    });
+}
+
+/* ----------------------------------------------------------
+   NEW YEAR COUNTDOWN
+----------------------------------------------------------- */
+function updateNewYearCountdown() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const newYear = new Date(currentYear + 1, 0, 1);
+    const timeLeft = newYear - now;
+    
+    if (timeLeft <= 0) {
+        document.getElementById("countdown").textContent = "🎉 С НОВЫМ ГОДОМ! 🎉";
+        return;
+    }
+    
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+    const countdownText = `${days}д ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    const countdown = document.getElementById("countdown");
+    if (countdown) {
+        countdown.textContent = countdownText;
+    }
+}
+
+setInterval(updateNewYearCountdown, 1000);
+updateNewYearCountdown();
 
 /* ----------------------------------------------------------
    FALLING PEAM
 ----------------------------------------------------------- */
 function spawnFallingPeam() {
     const img = document.createElement("img");
-    img.src = "peam.png";
+    img.src = "zinex.lol_files/peam.png";
     img.style.position = "fixed";
     img.style.width = "80px";
     img.style.left = (Math.random() * (window.innerWidth - 80)) + "px";
@@ -500,49 +625,22 @@ function spawnFallingPeam() {
         img.style.opacity = "0";
     });
 
-    setTimeout(() => img.remove(), 2500);
+    setTimeout(() => {
+        if (img.parentNode) {
+            img.parentNode.removeChild(img);
+        }
+    }, 2500);
 }
 
 /* ----------------------------------------------------------
-   NEW YEAR COUNTDOWN ()
------------------------------------------------------------ */
-function updateNewYearCountdown() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const newYear = new Date(currentYear + 1, 0, 1); // 1 января следующего года
-    const timeLeft = newYear - now;
-    
-    if (timeLeft <= 0) {
-        // Новый Год наступил!
-        document.getElementById("countdown").textContent = "🎉 С НОВЫМ ГОДОМ! 🎉";
-        return;
-    }
-    
-    
-    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-    
-    
-    const countdownText = `${days}д ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    const countdown = document.getElementById("countdown");
-    if (countdown) {
-        countdown.textContent = countdownText;
-    }
-}
-
-setInterval(updateNewYearCountdown, 1000);
-updateNewYearCountdown(); 
-
-/* ----------------------------------------------------------
-   CLICK COUNTDOWN = FALLING PEAM BURST ()
+   CLICK COUNTDOWN = FALLING PEAM BURST
 ----------------------------------------------------------- */
 document.addEventListener('DOMContentLoaded', function() {
     const countdown = document.getElementById("countdown");
     if (countdown) {
         countdown.addEventListener("click", (e) => {
+            if (!document.body.classList.contains('music-started')) return;
+            
             e.stopPropagation();
             const burst = 6 + Math.floor(Math.random() * 5);
             for (let i = 0; i < burst; i++) {
@@ -553,7 +651,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /* ----------------------------------------------------------
-   BLOSSOMS BEHIND COUNTDOWN (new year)
+   BLOSSOMS BEHIND COUNTDOWN
 ----------------------------------------------------------- */
 function spawnBlossom() {
     const wrapper = document.getElementById("countdown-wrapper");
@@ -570,15 +668,22 @@ function spawnBlossom() {
     blossom.style.animation = "blossomFall 4s linear forwards";
     
     wrapper.appendChild(blossom);
-    setTimeout(() => blossom.remove(), 4000);
+    setTimeout(() => {
+        if (blossom.parentNode) {
+            blossom.parentNode.removeChild(blossom);
+        }
+    }, 4000);
 }
 setInterval(spawnBlossom, 1300);
+
 /* ----------------------------------------------------------
    INTERACTIVE 3D MOUSE TILT EFFECT
 ----------------------------------------------------------- */
 function init3DTilt() {
     const panel = document.querySelector('.info-panel');
     const container = document.querySelector('.tilt-container');
+    
+    if (!panel || !container) return;
     
     container.addEventListener('mousemove', (e) => {
         const { left, top, width, height } = container.getBoundingClientRect();
@@ -596,7 +701,6 @@ function init3DTilt() {
             translateZ(${translateZ}px)
         `;
         
-        
         const shadowX = mouseX * 20;
         const shadowY = mouseY * 10;
         panel.style.boxShadow = `
@@ -605,11 +709,9 @@ function init3DTilt() {
         `;
     });
     
-    
     container.addEventListener('mouseleave', () => {
         panel.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
         panel.style.boxShadow = '0 0 25px rgba(115, 183, 255, 0.3)';
-        
         
         panel.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
         setTimeout(() => {
@@ -620,7 +722,7 @@ function init3DTilt() {
 
 document.addEventListener('DOMContentLoaded', init3DTilt);
 
-
+document.addEventListener('DOMContentLoaded', init3DTilt);
 /* --- credits: usagi --- */
 </script>
 
