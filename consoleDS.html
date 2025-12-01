@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ConsoleDS Menu</title>
+  <style>
+    body {
+      margin: 0;
+      background: #111;
+      font-family: sans-serif;
+      color: white;
+      overflow: hidden;
+    }
+
+    /* Верхняя панель ну что бы не забыть */
+    .top-bar {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      z-index: 10;
+    }
+    .top-left { display: flex; gap: 10px; align-items: center; }
+    .top-right { display: flex; gap: 15px; align-items: center; }
+    .profile-icon { width: 32px; height: 32px; border-radius: 50%; background: #444; }
+
+    /* Название выбранного приложения ну что бы не забыть */
+    .app-title {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      text-shadow: 0 0 10px #73b7ff;
+      z-index: 9;
+    }
+
+    /* Друзья бл слева на */
+    .friends {
+      position: fixed;
+      top: 100px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 9;
+    }
+    .friend-circle { width: 30px; height: 30px; border-radius: 50%; background: #555; }
+
+    /* Нижняя панель ну что бы не забыть */
+    .bottom-bar {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 20px;
+      z-index: 9;
+    }
+    .bottom-icon { width: 40px; height: 40px; background: #333; border-radius: 10px; }
+
+    /* ссетка игр ну что бы не забыть */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 30px;
+      padding: 140px 60px 200px; /* отступы сверху и снизу */
+      justify-items: center;
+      align-items: center;
+      height: 100vh;
+      box-sizing: border-box;
+      z-index: 7;
+    }
+    .game-icon {
+      width: 110px;
+      height: 110px;
+      background: #222;
+      border-radius: 20px;
+      position: relative;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+      cursor: pointer;
+    }
+    .game-icon.selected::before {
+      content: "";
+      position: absolute;
+      top: -6px; left: -6px; right: -6px; bottom: -6px;
+      border-radius: 26px;
+      background: linear-gradient(45deg, #ff00cc, #73b7ff, #00ffcc);
+      animation: pulse 2s linear infinite;
+      z-index: -1;
+    }
+
+    .game-title {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
+      text-shadow: 0 0 10px #73b7ff;
+      z-index: 9;
+    }
+
+    @keyframes pulse { 0% { filter: hue-rotate(0deg);} 100% { filter: hue-rotate(360deg);} }
+  
+.profile-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #444;
+  background-size: cover;
+  background-position: center;
+}
+
+.profile-icon.big {
+  width: 64px;
+  height: 64px;
+}
+
+
+.friend-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #555;
+  background-size: cover;
+  background-position: center;
+}
+
+#music-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  background: #333;
+  color: white;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
+  transition: background 0.3s;
+  z-index: 100;
+}
+
+#music-toggle:hover {
+  background: #555;
+}
+
+
+</style>
+</head>
+<body>
+
+<!-- Кнопка управления музыкой ну что бы не забыть -->
+<div id="music-toggle">🔊</div>
+
+<!-- аааудио ну что бы не забыть -->
+<audio id="background-music" loop>
+  <source src="zinex.lol_files/background-music.mp3" type="audio/mpeg">
+</audio>
+
+
+<!-- Верхняя панель ну что бы не забыть -->
+<div class="top-bar">
+  <div class="top-left">
+    <!-- аватар друзей -->
+    <div class="profile-icon" style="background-image:url('icons_Zii/sat.png');"></div>
+    <div>Друзья</div>
+  </div>
+  <div class="top-right">
+    <div>12/01</div>
+    <div>20:55</div>
+    <!-- иконка справа -->
+  <div class="profile-icon big" style="background-image:url('icons_Zii/zinex.gif');"></div>
+  </div>
+</div>
+
+
+  <!-- назв выбранного приложения -->
+  <div class="app-title">Игры</div>
+
+  <!-- друзья ну что бы не забыть -->
+  <div class="friends">
+    <div class="friend-circle"></div>
+    <div class="friend-circle"></div>
+    <div class="friend-circle"></div>
+  </div>
+
+  <!-- Нижняя панель ну что бы не забыть -->
+  <div class="bottom-bar">
+    <div class="bottom-icon"><!-- Домой --></div>
+    <div class="bottom-icon"><!-- Игры --></div>
+    <div class="bottom-icon"><!-- Достижения --></div>
+    <div class="bottom-icon"><!-- Друзья --></div>
+    <div class="bottom-icon"><!-- Все приложения --></div>
+  </div>
+
+  <!-- Сетка игр -->
+  <div class="game-grid">
+    <div class="game-icon selected" data-name="Emulator" data-url="data/index.html">
+  <img src="icons_Zii/md.png" alt="Sonic Icon" style="width:90%;height:90%;border-radius:5px;">
+</div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
+  </div>
+
+  <div class="game-title">Sonic the Hedgehog</div>
+
+<script>
+  const gameIcons = document.querySelectorAll('.game-icon');
+  let gameIndex = 0;
+
+  function updateGameSelection(index) {
+    gameIcons.forEach((icon, i) => {
+      icon.classList.toggle('selected', i === index);
+    });
+    const title = document.querySelector('.game-title');
+    const name = gameIcons[index].getAttribute('data-name') || 'Игра';
+    title.textContent = name;
+  }
+  updateGameSelection(gameIndex);
+
+  // Наведение мышью и клик ну что бы не забыть
+  gameIcons.forEach((icon, i) => {
+    icon.addEventListener('mouseenter', () => {
+      gameIndex = i;
+      updateGameSelection(gameIndex);
+    });
+    icon.addEventListener('click', () => {
+      const url = icon.getAttribute('data-url');
+      if (url) {
+        window.location.href = url;
+      }
+    });
+  });
+
+  // Навигация стрелками и запуск Enter ну что бы не забыть
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') {
+      gameIndex = (gameIndex + 1) % gameIcons.length;
+      updateGameSelection(gameIndex);
+    } else if (e.key === 'ArrowLeft') {
+      gameIndex = (gameIndex - 1 + gameIcons.length) % gameIcons.length;
+      updateGameSelection(gameIndex);
+    } else if (e.key === 'Enter') {
+      const url = gameIcons[gameIndex].getAttribute('data-url');
+      if (url) {
+        window.location.href = url;
+      }
+    }
+  });
+
+const music = document.getElementById('background-music');
+const toggleBtn = document.getElementById('music-toggle');
+let isPlaying = false;
+
+toggleBtn.addEventListener('click', () => {
+  if (isPlaying) {
+    music.pause();
+    toggleBtn.textContent = "🔇"; 
+  } else {
+    music.play();
+    toggleBtn.textContent = "🔊"; 
+  }
+  isPlaying = !isPlaying;
+});
+
+
+</script>
+
+</body>
+</html>

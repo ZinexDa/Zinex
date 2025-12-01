@@ -451,6 +451,42 @@ body.music-started .tilt-container {
     opacity: 0.6;
 }
 
+/* ---------------------- dfsad --------- */
+.nav-tabs {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 10000;
+}
+
+.nav-btn {
+  background: linear-gradient(45deg, #333, #555);
+  color: #fff;
+  border: 2px solid #73b7ff;
+  padding: 12px 18px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 8px;
+  will-change: transform;
+  transition: all 0.3s ease;
+  transform-style: preserve-3d;
+  box-shadow: 0 0 15px rgba(115, 183, 255, 0.3);
+}
+
+.nav-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 5px 20px rgba(115, 183, 255, 0.5);
+  background: linear-gradient(45deg, #555, #777);
+}
+
+.nav-btn:active {
+  transform: translateY(1px) scale(0.95);
+  transition: transform 0.1s ease;
+}
+
+
 </style>
 </head>
 
@@ -472,6 +508,12 @@ body.music-started .tilt-container {
     <img src="zinex.lol_files/zendex.png" class="logo interactive-logo" alt="Zendex Logo">
 </div>
 <h1>woooooooooooooooow</h1>
+
+<div class="nav-tabs">
+  <button class="nav-btn" onclick="location.href='zinex.lol.html'">Главная</button>
+  <button class="nav-btn" onclick="location.href='consoleDS.html'">Меню</button>
+</div>
+
 
 <div class="tilt-container-timer">
     <div id="countdown-wrapper">
@@ -754,6 +796,57 @@ if (muteButton && bgm) {
         }
     });
 }
+
+// === КРУГЛЫЙ ВИЗУАЛИЗАТОР ===
+const canvas = document.getElementById('canvasVisualizer');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+let rotation = 0;
+const barCount = 64;
+
+function drawBar(x, y, angle, height) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle);
+  ctx.fillStyle = '#73b7ff';
+  ctx.fillRect(-2, 0, 4, height);
+  ctx.restore();
+}
+
+function animate() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // находим центр логотипа
+  const logo = document.querySelector('.interactive-logo');
+  const rect = logo.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const radius = rect.width / 2 + 15; // круг чуть больше логотипа
+
+  ctx.save();
+  ctx.translate(centerX, centerY);
+  rotation += 0.01;
+
+  for (let i = 0; i < barCount; i++) {
+    const angle = (i * Math.PI * 2) / barCount + rotation;
+    const x = Math.cos(angle) * radius;
+    const y = Math.sin(angle) * radius;
+    const height = 20 + Math.sin(Date.now()/300 + i) * 40;
+    drawBar(x, y, angle, height);
+  }
+
+  ctx.restore();
+  requestAnimationFrame(animate);
+}
+animate();
+
 
 /* --- credits: usagi --- */
 </script>
