@@ -439,7 +439,7 @@ body.music-started .tilt-container {
     backdrop-filter: none !important;
 }
 
-/* ---------------------- CANVAS VISUALIZER ---------------------- */
+/* ---------------------- CANVAS VISUALIZER soon ---------------------- */
 #canvasVisualizer {
     position: fixed;
     top: 0;
@@ -691,7 +691,7 @@ function spawnBlossom() {
 setInterval(spawnBlossom, 1300);
 
 /* ----------------------------------------------------------
-   INTERACTIVE 3D MOUSE TILT EFFECT
+   3D MOUSE TILT EFFECT
 ----------------------------------------------------------- */
 function init3DTilt() {
     const panel = document.querySelector('.info-panel');
@@ -747,11 +747,10 @@ if (muteButton && bgm) {
         bgm.muted = !wasMuted;
         this.textContent = bgm.muted ? "🔇" : "🔈";
         
-        // Если выключаем звук - останавливаем визуализацию
         if (bgm.muted) {
-            console.log("🔇 Музыка выключена");
+            console.log("🔇 off");
         } else {
-            console.log("🔈 Музыка включена");
+            console.log("🔈 on");
         }
     });
 }
