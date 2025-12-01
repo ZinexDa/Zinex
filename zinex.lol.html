@@ -439,6 +439,7 @@ body.music-started .tilt-container {
     backdrop-filter: none !important;
 }
 
+/* ---------------------- CANVAS VISUALIZER ---------------------- */
 #canvasVisualizer {
     position: fixed;
     top: 0;
@@ -447,7 +448,7 @@ body.music-started .tilt-container {
     height: 100%;
     z-index: -1;
     pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.6;
 }
 
 </style>
@@ -738,60 +739,22 @@ document.addEventListener('DOMContentLoaded', init3DTilt);
 document.addEventListener('DOMContentLoaded', init3DTilt);
 
 /* ----------------------------------------------------------
-   CANVAS VISUALIZER
+   MUTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
 ----------------------------------------------------------- */
-function initCanvasVisualizer() {
-    const canvas = document.getElementById('canvasVisualizer');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
-    const bars = 64;
-    const frequencies = new Array(bars).fill(0);
-    
-    function animate() {
-        ctx.fillStyle = 'rgba(17, 17, 17, 0.1)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+if (muteButton && bgm) {
+    muteButton.addEventListener('click', function() {
+        const wasMuted = bgm.muted;
+        bgm.muted = !wasMuted;
+        this.textContent = bgm.muted ? "🔇" : "🔈";
         
-        if (!document.body.classList.contains('music-started') || !bgm || bgm.muted) {
-            requestAnimationFrame(animate);
-            return;
+        // Если выключаем звук - останавливаем визуализацию
+        if (bgm.muted) {
+            console.log("🔇 Музыка выключена");
+        } else {
+            console.log("🔈 Музыка включена");
         }
-        
-        for (let i = 0; i < bars; i++) {
-            frequencies[i] += (Math.random() * 2 - 1) * 0.3;
-            frequencies[i] = Math.max(0.1, Math.min(1, frequencies[i]));
-            
-            const height = frequencies[i] * canvas.height * 0.5;
-            const x = i * (canvas.width / bars);
-            const y = canvas.height - height;
-            const width = canvas.width / bars - 2;
-            
-            // Градиент
-            const gradient = ctx.createLinearGradient(x, y, x, canvas.height);
-            gradient.addColorStop(0, '#ff00cc');
-            gradient.addColorStop(0.5, '#73b7ff');
-            gradient.addColorStop(1, '#4a90e2');
-            
-            ctx.fillStyle = gradient;
-            ctx.fillRect(x, y, width, height);
-        }
-        
-        requestAnimationFrame(animate);
-    }
-    
-    animate();
+    });
 }
-
-// Запускаем когда DOM загружен
-document.addEventListener('DOMContentLoaded', initCanvasVisualizer);
 
 /* --- credits: usagi --- */
 </script>
