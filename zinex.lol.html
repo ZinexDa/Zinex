@@ -542,7 +542,7 @@ musicOverlay.addEventListener('click', function() {
             console.log("music started wooww");
         }).catch(error => {
             console.log("error music", error);
-            // Показываем ошибку пользователю
+
             const errorMsg = document.createElement('div');
             errorMsg.innerHTML = '❌ Music error - file not found';
             errorMsg.style.cssText = 'position:fixed; top:10px; left:10px; background:red; color:white; padding:10px; z-index:100001;';
