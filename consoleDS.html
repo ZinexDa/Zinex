@@ -312,13 +312,58 @@
 }
 
 @media (max-width: 600px) {
+  .pages-container {
+    padding: 100px 20px 150px;
+  }
+  
   .game-grid {
     grid-template-columns: repeat(3, 1fr); /* телефон: 3 колонки */
+    gap: 15px;
+    padding: 100px 20px 150px;
   }
+  
+  .game-icon {
+    max-width: 90px;
+  }
+  
   .page-nav-btn {
     width: 35px;
     height: 35px;
     font-size: 18px;
+  }
+  
+  .page-indicator {
+    bottom: 80px;
+  }
+  
+  .volume-control {
+    width: 180px;
+    bottom: 70px;
+    right: 10px;
+    padding: 12px;
+  }
+  
+  .volume-slider-handle {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .top-bar {
+    font-size: 12px;
+  }
+  
+  .top-left, .top-right {
+    padding: 4px 8px;
+  }
+  
+  .profile-icon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .profile-icon.big {
+    width: 48px;
+    height: 48px;
   }
 }
 
@@ -737,7 +782,6 @@
   const pageNextBtn = document.getElementById('page-next');
   const pageIndicator = document.getElementById('page-indicator');
 
-  // Инициализация индикатора страниц
   function initPageIndicator() {
     pageIndicator.innerHTML = '';
     pages.forEach((_, index) => {
@@ -749,7 +793,6 @@
     updatePageButtons();
   }
 
-  // Переход на страницу
   function goToPage(pageIndex, setIndex = null) {
     if (pageIndex < 0 || pageIndex >= pages.length) return;
     
@@ -771,20 +814,16 @@
       newGrid.style.transform = 'translateX(0)';
       currentPage = pageIndex;
       
-      // Обновить индикатор и кнопки
       updatePageIndicator();
       updatePageButtons();
       
-      // Установить индекс на новой странице
       const iconsOnPage = newGrid.querySelectorAll('.game-icon');
       if (iconsOnPage.length > 0) {
         if (setIndex !== null) {
           currentGameIndex = Math.min(setIndex, iconsOnPage.length - 1);
         } else if (direction === 'next') {
-          // При переходе вперед - первая иконка
           currentGameIndex = 0;
         } else {
-          // При переходе назад - последняя иконка
           currentGameIndex = iconsOnPage.length - 1;
         }
         updateGameSelection(currentGameIndex, newGrid);
@@ -792,7 +831,6 @@
     }, 10);
   }
 
-  // Обновить индикатор страниц
   function updatePageIndicator() {
     const dots = pageIndicator.querySelectorAll('.page-dot');
     dots.forEach((dot, index) => {
@@ -800,13 +838,11 @@
     });
   }
 
-  // Обновить кнопки навигации
   function updatePageButtons() {
     pagePrevBtn.disabled = currentPage === 0;
     pageNextBtn.disabled = currentPage === pages.length - 1;
   }
 
-  // Обработчики кнопок
   pagePrevBtn.addEventListener('click', () => {
     if (currentPage > 0) goToPage(currentPage - 1);
   });
@@ -815,7 +851,6 @@
     if (currentPage < pages.length - 1) goToPage(currentPage + 1);
   });
 
-  // Инициализация
   initPageIndicator();
 
   // ========== НАВИГАЦИЯ ПО ИКОНКАМ ==========
@@ -839,10 +874,8 @@
     }
   }
 
-  // Инициализация выбора на первой странице
   updateGameSelection(currentGameIndex);
 
-  // Наведение мышью и клик
   pages.forEach((grid) => {
     const icons = grid.querySelectorAll('.game-icon');
     icons.forEach((icon, i) => {
@@ -861,12 +894,9 @@
     });
   });
 
-  // Состояние навигации (объявлено глобально для доступа из других функций)
   window.isNavigatingMute = false;
 
-  // Навигация стрелками и запуск Enter
   document.addEventListener('keydown', (e) => {
-    // Работает только в секции home
     const homeSection = document.getElementById('section-home');
     if (!homeSection || !homeSection.classList.contains('active')) {
       return;
@@ -874,10 +904,8 @@
     
     const gameIcons = getCurrentPageIcons();
     
-    // Если находимся на кнопке mute
     if (window.isNavigatingMute) {
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        // Вернуться к иконкам
         window.isNavigatingMute = false;
         toggleBtn.classList.remove('focused');
         toggleBtn.blur();
@@ -888,7 +916,6 @@
         }
         return;
       } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        // Управление громкостью
         if (e.key === 'ArrowRight') {
           volume = Math.min(1, volume + 0.1);
         } else {
@@ -898,7 +925,6 @@
         updateVolumeDisplay();
         return;
       } else if (e.key === 'Enter') {
-        // Переключить mute/unmute
         toggleBtn.click();
         return;
       }
@@ -908,43 +934,36 @@
     if (gameIcons.length === 0) return;
     
     if (e.key === 'ArrowRight') {
-      // Если на последней иконке страницы, перейти на следующую страницу
       if (currentGameIndex === gameIcons.length - 1 && currentPage < pages.length - 1) {
-        goToPage(currentPage + 1, 0); // Переход на следующую страницу, индекс 0
+        goToPage(currentPage + 1, 0);
       } else {
         currentGameIndex = (currentGameIndex + 1) % gameIcons.length;
         updateGameSelection(currentGameIndex);
       }
     } else if (e.key === 'ArrowLeft') {
-      // Если на первой иконке страницы, перейти на предыдущую страницу
       if (currentGameIndex === 0 && currentPage > 0) {
         const prevPageIcons = pages[currentPage - 1].querySelectorAll('.game-icon');
-        goToPage(currentPage - 1, prevPageIcons.length - 1); // Переход на предыдущую, последняя иконка
+        goToPage(currentPage - 1, prevPageIcons.length - 1);
       } else {
         currentGameIndex = (currentGameIndex - 1 + gameIcons.length) % gameIcons.length;
         updateGameSelection(currentGameIndex);
       }
     } else if (e.key === 'ArrowUp') {
-      // Навигация вверх по сетке (5 колонок)
-      const cols = 5;
+      const cols = window.innerWidth <= 600 ? 3 : (window.innerWidth <= 1024 ? 4 : 5);
       if (currentGameIndex >= cols) {
         currentGameIndex -= cols;
         updateGameSelection(currentGameIndex);
       }
     } else if (e.key === 'ArrowDown') {
-      // Навигация вниз по сетке (5 колонок)
-      const cols = 5;
-      // Если на последней строке, перейти на кнопку mute
+      const cols = window.innerWidth <= 600 ? 3 : (window.innerWidth <= 1024 ? 4 : 5);
       const rows = Math.ceil(gameIcons.length / cols);
       const currentRow = Math.floor(currentGameIndex / cols);
       if (currentRow === rows - 1 && currentGameIndex === gameIcons.length - 1) {
-        // Перейти на кнопку mute
         window.isNavigatingMute = true;
         toggleBtn.focus();
         toggleBtn.classList.add('focused');
         volumeControl.style.opacity = '1';
         volumeControl.style.visibility = 'visible';
-        // Убрать выделение с иконок
         gameIcons.forEach(icon => icon.classList.remove('selected'));
       } else if (currentGameIndex + cols < gameIcons.length) {
         currentGameIndex += cols;
@@ -968,29 +987,38 @@ let isPlaying = false;
 let isMuteFocused = false;
 let volume = 1; // Громкость от 0 до 1
 
-// Инициализация громкости
 if (music) {
   music.volume = volume;
   updateVolumeDisplay();
 }
 
-// Обновление отображения громкости
 function updateVolumeDisplay() {
   const percentage = volume * 100;
   volumeFill.style.transform = `scaleX(${volume})`;
   volumeHandle.style.left = `${percentage}%`;
 }
 
-// Управление громкостью через слайдер
 let isDragging = false;
 
+function updateVolumeFromEvent(e) {
+  const rect = volumeContainer.getBoundingClientRect();
+  const clientX = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+  const x = clientX - rect.left;
+  const percentage = Math.max(0, Math.min(1, x / rect.width));
+  volume = percentage;
+  if (music) music.volume = volume;
+  updateVolumeDisplay();
+}
+
 volumeContainer.addEventListener('mousedown', (e) => {
+  e.preventDefault();
   isDragging = true;
   updateVolumeFromEvent(e);
 });
 
 document.addEventListener('mousemove', (e) => {
   if (isDragging) {
+    e.preventDefault();
     updateVolumeFromEvent(e);
   }
 });
@@ -999,17 +1027,27 @@ document.addEventListener('mouseup', () => {
   isDragging = false;
 });
 
-function updateVolumeFromEvent(e) {
-  const rect = volumeContainer.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const percentage = Math.max(0, Math.min(1, x / rect.width));
-  volume = percentage;
-  if (music) music.volume = volume;
-  updateVolumeDisplay();
-}
+volumeContainer.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  isDragging = true;
+  updateVolumeFromEvent(e);
+}, { passive: false });
 
+document.addEventListener('touchmove', (e) => {
+  if (isDragging) {
+    e.preventDefault();
+    updateVolumeFromEvent(e);
+  }
+}, { passive: false });
 
-// Клик по кнопке mute
+document.addEventListener('touchend', () => {
+  isDragging = false;
+});
+
+document.addEventListener('touchcancel', () => {
+  isDragging = false;
+});
+
 toggleBtn.addEventListener('click', () => {
   if (isPlaying) {
     music.pause();
@@ -1021,7 +1059,6 @@ toggleBtn.addEventListener('click', () => {
   isPlaying = !isPlaying;
 });
 
-// Фокус на кнопке mute
 toggleBtn.addEventListener('focus', () => {
   isMuteFocused = true;
   window.isNavigatingMute = true;
@@ -1034,7 +1071,6 @@ toggleBtn.addEventListener('blur', () => {
   isMuteFocused = false;
   if (!window.isNavigatingMute) {
     toggleBtn.classList.remove('focused');
-    // Скрыть регулятор только если не наведена мышь
     if (!volumeControl.matches(':hover')) {
       volumeControl.style.opacity = '0';
       volumeControl.style.visibility = 'hidden';
@@ -1042,7 +1078,6 @@ toggleBtn.addEventListener('blur', () => {
   }
 });
 
-// Показать регулятор при наведении на него
 volumeControl.addEventListener('mouseenter', () => {
   volumeControl.style.opacity = '1';
   volumeControl.style.visibility = 'visible';
@@ -1055,24 +1090,17 @@ volumeControl.addEventListener('mouseleave', () => {
   }
 });
 
-// Инициализация иконки музыки (по умолчанию выключена)
 toggleBtn.textContent = "🔇";
 
 // ========== ОБНОВЛЕНИЕ ДАТЫ И ВРЕМЕНИ ==========
 function updateDateTime() {
   const now = new Date();
-  
-  // Форматирование даты (день/месяц)
   const day = String(now.getDate()).padStart(2, '0');
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const dateStr = `${day}/${month}`;
-  
-  // Форматирование времени (часы:минуты)
   const hours = String(now.getHours()).padStart(2, '0');
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const timeStr = `${hours}:${minutes}`;
-  
-  // Обновление элементов
   const dateElement = document.getElementById('current-date');
   const timeElement = document.getElementById('current-time');
   
@@ -1080,32 +1108,22 @@ function updateDateTime() {
   if (timeElement) timeElement.textContent = timeStr;
 }
 
-// Обновление сразу при загрузке
 updateDateTime();
-
-// Обновление каждую минуту
 setInterval(updateDateTime, 60000);
 
-// секции
 const bottomIcons = document.querySelectorAll('.bottom-icon');
 const sections = document.querySelectorAll('.section');
 
 bottomIcons.forEach(icon => {
   icon.addEventListener('click', () => {
-    // снять выделение со всех кнопок
     bottomIcons.forEach(i => i.classList.remove('active'));
-    // выделить текущую
     icon.classList.add('active');
-
-    // скрыть все секции
     sections.forEach(sec => sec.classList.remove('active'));
-    // показать нужную
     const target = icon.getAttribute('data-section');
     document.getElementById('section-' + target).classList.add('active');
   });
 });
 
-// По умолчанию активна секция "Домой" (уже установлено в HTML, но на всякий случай)
 const homeIcon = document.querySelector('.bottom-icon[data-section="home"]');
 if (homeIcon && !homeIcon.classList.contains('active')) {
   homeIcon.classList.add('active');
