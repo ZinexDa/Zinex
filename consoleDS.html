@@ -24,9 +24,26 @@
       font-size: 14px;
       z-index: 10;
     }
-    .top-left { display: flex; gap: 10px; align-items: center; }
-    .top-right { display: flex; gap: 15px; align-items: center; }
-    .profile-icon { width: 32px; height: 32px; border-radius: 50%; background: #444; }
+    .top-left { 
+      display: flex; 
+      gap: 10px; 
+      align-items: center;
+      padding: 6px 12px;
+      background: rgba(50, 50, 50, 0.6);
+      border: 2px solid rgba(150, 150, 150, 0.5);
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+    .top-right { 
+      display: flex; 
+      gap: 15px; 
+      align-items: center;
+      padding: 6px 12px;
+      background: rgba(50, 50, 50, 0.6);
+      border: 2px solid rgba(150, 150, 150, 0.5);
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
 
     /* Название выбранного приложения ну что бы не забыть */
     .app-title {
@@ -49,50 +66,262 @@
       gap: 15px;
       z-index: 9;
     }
-    .friend-circle { width: 30px; height: 30px; border-radius: 50%; background: #555; }
 
-    /* Нижняя панель ну что бы не забыть */
-    .bottom-bar {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 20px;
-      z-index: 9;
-    }
-    .bottom-icon { width: 40px; height: 40px; background: #333; border-radius: 10px; }
+/* Нижняя панель */
+.bottom-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.2);
+  z-index: 20;
+}
 
-    /* ссетка игр ну что бы не забыть */
-    .game-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 30px;
-      padding: 140px 60px 200px; /* отступы сверху и снизу */
-      justify-items: center;
-      align-items: center;
-      height: 100vh;
-      box-sizing: border-box;
-      z-index: 7;
-    }
-    .game-icon {
-      width: 110px;
-      height: 110px;
-      background: #222;
-      border-radius: 20px;
-      position: relative;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
-      cursor: pointer;
-    }
-    .game-icon.selected::before {
-      content: "";
-      position: absolute;
-      top: -6px; left: -6px; right: -6px; bottom: -6px;
-      border-radius: 26px;
-      background: linear-gradient(45deg, #ff00cc, #73b7ff, #00ffcc);
-      animation: pulse 2s linear infinite;
-      z-index: -1;
-    }
+.bottom-bar {
+  display: flex;
+  gap: 25px;
+}
+
+.bottom-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s, box-shadow 0.3s;
+  background: transparent; /* кнопки прозрачные внутри рамки */
+  position: relative;
+}
+
+.bottom-icon img {
+  width: 70%;
+  height: 70%;
+  pointer-events: none; /* клики идут на div, а не на картинку */
+}
+
+.bottom-icon:hover {
+  transform: scale(1.1);
+}
+
+.bottom-icon.active::after {
+  content: "";
+  position: absolute;
+  top: -6px; left: -6px; right: -6px; bottom: -6px;
+  border-radius: 12px; /* квадрат с закруглёнными углами */
+  box-shadow: 0 0 20px rgba(115,183,255,0.8),
+              0 0 40px rgba(80,100,255,0.6),
+              0 0 60px rgba(150,80,255,0.4);
+  z-index: -1;
+
+  /* пульсация */
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%   { opacity: 0.6; transform: scale(0.95); }
+  50%  { opacity: 1;   transform: scale(1.05); }
+  100% { opacity: 0.6; transform: scale(0.95); }
+}
+
+
+/* Контейнер для страниц */
+.pages-container {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 200px);
+  overflow: hidden;
+  padding: 140px 60px 200px;
+  box-sizing: border-box;
+}
+
+/* Сетка игр (страница) */
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 колонок как в 3DS */
+  grid-template-rows: repeat(3, 1fr);    /* 3 ряда */
+  gap: 25px;
+  justify-items: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  padding: 140px 60px 200px;
+  box-sizing: border-box;
+}
+
+.game-grid.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.game-grid.prev {
+  transform: translateX(-100%);
+}
+
+.game-icon {
+  width: 100%;
+  max-width: 120px;   /* размер как в 3DS */
+  aspect-ratio: 1 / 1; /* квадратная форма */
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  border-radius: 15px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: visible; /* важно для видимости обводки */
+}
+
+.game-icon:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(115,183,255,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.game-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.game-icon.selected::before {
+  content: "";
+  position: absolute;
+  top: -4px; left: -4px; right: -4px; bottom: -4px;
+  border-radius: 19px;
+  background: linear-gradient(45deg, #ff00cc, #73b7ff, #00ffcc);
+  animation: pulse 2s linear infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.game-icon.selected::after {
+  content: "";
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+  z-index: 1;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+  pointer-events: none;
+}
+
+.game-icon.selected img {
+  position: relative;
+  z-index: 2;
+}
+
+/* Индикатор страниц */
+.page-indicator {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 15;
+  align-items: center;
+}
+
+.page-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.page-dot.active {
+  background: #73b7ff;
+  width: 24px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(115,183,255,0.6);
+}
+
+/* Кнопки навигации страниц */
+.page-nav-btn {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(34,34,34,0.8);
+  border: 2px solid rgba(115,183,255,0.5);
+  border-radius: 50%;
+  color: #73b7ff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 15;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.page-nav-btn:hover {
+  background: rgba(115,183,255,0.2);
+  border-color: #73b7ff;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.page-nav-btn.left {
+  left: 20px;
+}
+
+.page-nav-btn.right {
+  right: 20px;
+}
+
+.page-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.page-nav-btn:disabled:hover {
+  transform: translateY(-50%);
+  background: rgba(34,34,34,0.8);
+}
+
+/* Адаптивность */
+@media (max-width: 1024px) {
+  .game-grid {
+    grid-template-columns: repeat(4, 1fr); /* планшет: 4 колонки */
+  }
+  .page-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  .page-nav-btn.left {
+    left: 10px;
+  }
+  .page-nav-btn.right {
+    right: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  .game-grid {
+    grid-template-columns: repeat(3, 1fr); /* телефон: 3 колонки */
+  }
+  .page-nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+  }
+}
+
 
     .game-title {
       position: fixed;
@@ -145,12 +374,151 @@
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(255,255,255,0.3);
-  transition: background 0.3s;
+  transition: all 0.3s;
   z-index: 100;
+  outline: none;
 }
 
-#music-toggle:hover {
+#music-toggle:hover,
+#music-toggle.focused {
   background: #555;
+  transform: scale(1.1);
+  box-shadow: 0 0 20px rgba(115,183,255,0.5);
+}
+
+/* Регулятор громкости */
+.volume-control {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 200px;
+  padding: 15px;
+  background: rgba(30, 30, 30, 0.95);
+  border: 2px solid rgba(150, 150, 150, 0.3);
+  border-radius: 15px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  z-index: 101;
+  backdrop-filter: blur(10px);
+}
+
+#music-toggle:hover ~ .volume-control,
+#music-toggle.focused ~ .volume-control,
+.volume-control:hover {
+  opacity: 1;
+  visibility: visible;
+}
+
+.volume-slider-container {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: rgba(100, 100, 100, 0.3);
+  border-radius: 10px;
+  overflow: visible; /* Чтобы ползунок был виден */
+  padding: 5px 0; /* Отступы сверху и снизу для ползунка */
+  box-sizing: content-box;
+}
+
+.volume-slider-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #4a90e2, #5dade2, #7d3c98);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease infinite;
+  border-radius: 10px;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.volume-slider-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #4a90e2, #5dade2, #7d3c98);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease infinite;
+  border-radius: 10px;
+  transform-origin: left;
+}
+
+.volume-slider-handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  width: 22px;
+  height: 22px;
+  background: white;
+  border: 3px solid #4a90e2;
+  border-radius: 50%;
+  cursor: grab;
+  box-shadow: 0 2px 10px rgba(74, 144, 226, 0.6), 0 0 15px rgba(74, 144, 226, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  z-index: 10;
+}
+
+.volume-slider-handle:hover {
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 3px 15px rgba(74, 144, 226, 0.8), 0 0 20px rgba(74, 144, 226, 0.6);
+}
+
+.volume-slider-handle:active {
+  cursor: grabbing;
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.volume-label {
+  color: white;
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.volume-indicators {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  padding: 0 2px;
+}
+
+.volume-indicator {
+  font-size: 18px;
+  font-weight: bold;
+  user-select: none;
+  pointer-events: none;
+}
+
+.volume-indicator.minus {
+  color: #ff5050;
+  text-shadow: 0 0 8px rgba(255, 80, 80, 0.6);
+}
+
+.volume-indicator.plus {
+  color: #50ff50;
+  text-shadow: 0 0 8px rgba(80, 255, 80, 0.6);
+}
+
+/* ---------секции */
+.section {
+  display: none;
+  padding: 80px 20px;
+  text-align: center;
+  color: white;
+}
+.section.active {
+  display: block;
 }
 
 
@@ -159,7 +527,19 @@
 <body>
 
 <!-- Кнопка управления музыкой ну что бы не забыть -->
-<div id="music-toggle">🔊</div>
+<div id="music-toggle" tabindex="0">🔊</div>
+<div class="volume-control">
+  <div class="volume-label">Громкость</div>
+  <div class="volume-indicators">
+    <div class="volume-indicator minus">−</div>
+    <div class="volume-indicator plus">+</div>
+  </div>
+  <div class="volume-slider-container">
+    <div class="volume-slider-track"></div>
+    <div class="volume-slider-fill" id="volume-fill"></div>
+    <div class="volume-slider-handle" id="volume-handle"></div>
+  </div>
+</div>
 
 <!-- аааудио ну что бы не забыть -->
 <audio id="background-music" loop>
@@ -175,8 +555,8 @@
     <div>Друзья</div>
   </div>
   <div class="top-right">
-    <div>12/01</div>
-    <div>20:55</div>
+    <div id="current-date">12/01</div>
+    <div id="current-time">20:55</div>
     <!-- иконка справа -->
   <div class="profile-icon big" style="background-image:url('icons_Zii/zinex.gif');"></div>
   </div>
@@ -184,7 +564,7 @@
 
 
   <!-- назв выбранного приложения -->
-  <div class="app-title">Игры</div>
+  <div class="app-title">-</div>
 
   <!-- друзья ну что бы не забыть -->
   <div class="friends">
@@ -193,71 +573,386 @@
     <div class="friend-circle"></div>
   </div>
 
-  <!-- Нижняя панель ну что бы не забыть -->
+<!-- Нижняя панель в рамке -->
+<div class="bottom-wrapper">
   <div class="bottom-bar">
-    <div class="bottom-icon"><!-- Домой --></div>
-    <div class="bottom-icon"><!-- Игры --></div>
-    <div class="bottom-icon"><!-- Достижения --></div>
-    <div class="bottom-icon"><!-- Друзья --></div>
-    <div class="bottom-icon"><!-- Все приложения --></div>
+    <div class="bottom-icon" data-section="home">
+      <img src="icons_Zii/Home.png" alt="Home" />
+    </div>
+    <div class="bottom-icon" data-section="games">
+      <img src="icons_Zii/Games.png" alt="Games" />
+    </div>
+    <div class="bottom-icon" data-section="achievements">
+      <img src="icons_Zii/Achievements.png" alt="Achievements" />
+    </div>
+    <div class="bottom-icon" data-section="friends">
+      <img src="icons_Zii/Friends.png" alt="Friends" />
+    </div>
+    <div class="bottom-icon" data-section="apps">
+      <img src="icons_Zii/ALLApps.png" alt="All Apps" />
+    </div>
   </div>
-
-  <!-- Сетка игр -->
-  <div class="game-grid">
-    <div class="game-icon selected" data-name="Emulator" data-url="data/index.html">
-  <img src="icons_Zii/md.png" alt="Sonic Icon" style="width:90%;height:90%;border-radius:5px;">
 </div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-    <div class="game-icon" data-name="—"><!-- ПУСТО --></div>
-  </div>
 
-  <div class="game-title">Sonic the Hedgehog</div>
+<!-- Секции -->
+<div id="section-home" class="section active">
+  <!-- Контейнер страниц -->
+  <div class="pages-container">
+    <!-- Страница 1 -->
+    <div class="game-grid active" data-page="0">
+      <div class="game-icon selected" data-name="Emulator" data-url="data/index.html">
+        <img src="icons_Zii/md.png" alt="Emulator Icon">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+    </div>
+    <!-- Страница 2 (пример - можно добавить больше страниц) -->
+    <div class="game-grid" data-page="1">
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+      <div class="game-icon" data-name="—">
+        <img src="icons_Zii/empty.png" alt="Empty">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Кнопки навигации страниц -->
+  <button class="page-nav-btn left" id="page-prev">‹</button>
+  <button class="page-nav-btn right" id="page-next">›</button>
+  
+  <!-- Индикатор страниц -->
+  <div class="page-indicator" id="page-indicator"></div>
+  
+  <div class="game-title">Emulator</div>
+</div>
+
+<div id="section-games" class="section">
+  <h2>Игры</h2>
+  <p>Здесь пока пусто.</p>
+</div>
+
+<div id="section-achievements" class="section">
+  <h2>Достижения</h2>
+  <p>Здесь будут достижения.</p>
+</div>
+
+<div id="section-friends" class="section">
+  <h2>Друзья</h2>
+  <p>Здесь будет список друзей.</p>
+</div>
+
+<div id="section-apps" class="section">
+  <h2>Все приложения</h2>
+  <p>Здесь будут приложения.</p>
+</div>
+
+
 
 <script>
-  const gameIcons = document.querySelectorAll('.game-icon');
-  let gameIndex = 0;
+  // ========== СИСТЕМА СТРАНИЦ ==========
+  let currentPage = 0;
+  let currentGameIndex = 0;
+  const pages = document.querySelectorAll('.game-grid');
+  const pagePrevBtn = document.getElementById('page-prev');
+  const pageNextBtn = document.getElementById('page-next');
+  const pageIndicator = document.getElementById('page-indicator');
 
-  function updateGameSelection(index) {
+  // Инициализация индикатора страниц
+  function initPageIndicator() {
+    pageIndicator.innerHTML = '';
+    pages.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.className = 'page-dot' + (index === currentPage ? ' active' : '');
+      dot.addEventListener('click', () => goToPage(index));
+      pageIndicator.appendChild(dot);
+    });
+    updatePageButtons();
+  }
+
+  // Переход на страницу
+  function goToPage(pageIndex, setIndex = null) {
+    if (pageIndex < 0 || pageIndex >= pages.length) return;
+    
+    const direction = pageIndex > currentPage ? 'next' : 'prev';
+    const currentGrid = pages[currentPage];
+    const newGrid = pages[pageIndex];
+    
+    currentGrid.classList.remove('active');
+    if (direction === 'next') {
+      currentGrid.classList.add('prev');
+      newGrid.style.transform = 'translateX(100%)';
+    } else {
+      newGrid.style.transform = 'translateX(-100%)';
+    }
+    
+    setTimeout(() => {
+      currentGrid.classList.remove('prev');
+      newGrid.classList.add('active');
+      newGrid.style.transform = 'translateX(0)';
+      currentPage = pageIndex;
+      
+      // Обновить индикатор и кнопки
+      updatePageIndicator();
+      updatePageButtons();
+      
+      // Установить индекс на новой странице
+      const iconsOnPage = newGrid.querySelectorAll('.game-icon');
+      if (iconsOnPage.length > 0) {
+        if (setIndex !== null) {
+          currentGameIndex = Math.min(setIndex, iconsOnPage.length - 1);
+        } else if (direction === 'next') {
+          // При переходе вперед - первая иконка
+          currentGameIndex = 0;
+        } else {
+          // При переходе назад - последняя иконка
+          currentGameIndex = iconsOnPage.length - 1;
+        }
+        updateGameSelection(currentGameIndex, newGrid);
+      }
+    }, 10);
+  }
+
+  // Обновить индикатор страниц
+  function updatePageIndicator() {
+    const dots = pageIndicator.querySelectorAll('.page-dot');
+    dots.forEach((dot, index) => {
+      dot.classList.toggle('active', index === currentPage);
+    });
+  }
+
+  // Обновить кнопки навигации
+  function updatePageButtons() {
+    pagePrevBtn.disabled = currentPage === 0;
+    pageNextBtn.disabled = currentPage === pages.length - 1;
+  }
+
+  // Обработчики кнопок
+  pagePrevBtn.addEventListener('click', () => {
+    if (currentPage > 0) goToPage(currentPage - 1);
+  });
+
+  pageNextBtn.addEventListener('click', () => {
+    if (currentPage < pages.length - 1) goToPage(currentPage + 1);
+  });
+
+  // Инициализация
+  initPageIndicator();
+
+  // ========== НАВИГАЦИЯ ПО ИКОНКАМ ==========
+  function getCurrentPageIcons() {
+    const currentGrid = pages[currentPage];
+    return currentGrid ? currentGrid.querySelectorAll('.game-icon') : [];
+  }
+
+  function updateGameSelection(index, grid = null) {
+    const currentGrid = grid || pages[currentPage];
+    const gameIcons = currentGrid.querySelectorAll('.game-icon');
+    
     gameIcons.forEach((icon, i) => {
       icon.classList.toggle('selected', i === index);
     });
+    
     const title = document.querySelector('.game-title');
-    const name = gameIcons[index].getAttribute('data-name') || 'Игра';
-    title.textContent = name;
+    if (gameIcons[index]) {
+      const name = gameIcons[index].getAttribute('data-name') || '—';
+      title.textContent = name;
+    }
   }
-  updateGameSelection(gameIndex);
 
-  // Наведение мышью и клик ну что бы не забыть
-  gameIcons.forEach((icon, i) => {
-    icon.addEventListener('mouseenter', () => {
-      gameIndex = i;
-      updateGameSelection(gameIndex);
-    });
-    icon.addEventListener('click', () => {
-      const url = icon.getAttribute('data-url');
-      if (url) {
-        window.location.href = url;
-      }
+  // Инициализация выбора на первой странице
+  updateGameSelection(currentGameIndex);
+
+  // Наведение мышью и клик
+  pages.forEach((grid) => {
+    const icons = grid.querySelectorAll('.game-icon');
+    icons.forEach((icon, i) => {
+      icon.addEventListener('mouseenter', () => {
+        if (grid.classList.contains('active')) {
+          currentGameIndex = i;
+          updateGameSelection(currentGameIndex, grid);
+        }
+      });
+      icon.addEventListener('click', () => {
+        const url = icon.getAttribute('data-url');
+        if (url && url !== '—') {
+          window.location.href = url;
+        }
+      });
     });
   });
 
-  // Навигация стрелками и запуск Enter ну что бы не забыть
+  // Состояние навигации (объявлено глобально для доступа из других функций)
+  window.isNavigatingMute = false;
+
+  // Навигация стрелками и запуск Enter
   document.addEventListener('keydown', (e) => {
+    // Работает только в секции home
+    const homeSection = document.getElementById('section-home');
+    if (!homeSection || !homeSection.classList.contains('active')) {
+      return;
+    }
+    
+    const gameIcons = getCurrentPageIcons();
+    
+    // Если находимся на кнопке mute
+    if (window.isNavigatingMute) {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        // Вернуться к иконкам
+        window.isNavigatingMute = false;
+        toggleBtn.classList.remove('focused');
+        toggleBtn.blur();
+        volumeControl.style.opacity = '0';
+        volumeControl.style.visibility = 'hidden';
+        if (gameIcons.length > 0) {
+          updateGameSelection(currentGameIndex);
+        }
+        return;
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        // Управление громкостью
+        if (e.key === 'ArrowRight') {
+          volume = Math.min(1, volume + 0.1);
+        } else {
+          volume = Math.max(0, volume - 0.1);
+        }
+        if (music) music.volume = volume;
+        updateVolumeDisplay();
+        return;
+      } else if (e.key === 'Enter') {
+        // Переключить mute/unmute
+        toggleBtn.click();
+        return;
+      }
+      return;
+    }
+    
+    if (gameIcons.length === 0) return;
+    
     if (e.key === 'ArrowRight') {
-      gameIndex = (gameIndex + 1) % gameIcons.length;
-      updateGameSelection(gameIndex);
+      // Если на последней иконке страницы, перейти на следующую страницу
+      if (currentGameIndex === gameIcons.length - 1 && currentPage < pages.length - 1) {
+        goToPage(currentPage + 1, 0); // Переход на следующую страницу, индекс 0
+      } else {
+        currentGameIndex = (currentGameIndex + 1) % gameIcons.length;
+        updateGameSelection(currentGameIndex);
+      }
     } else if (e.key === 'ArrowLeft') {
-      gameIndex = (gameIndex - 1 + gameIcons.length) % gameIcons.length;
-      updateGameSelection(gameIndex);
+      // Если на первой иконке страницы, перейти на предыдущую страницу
+      if (currentGameIndex === 0 && currentPage > 0) {
+        const prevPageIcons = pages[currentPage - 1].querySelectorAll('.game-icon');
+        goToPage(currentPage - 1, prevPageIcons.length - 1); // Переход на предыдущую, последняя иконка
+      } else {
+        currentGameIndex = (currentGameIndex - 1 + gameIcons.length) % gameIcons.length;
+        updateGameSelection(currentGameIndex);
+      }
+    } else if (e.key === 'ArrowUp') {
+      // Навигация вверх по сетке (5 колонок)
+      const cols = 5;
+      if (currentGameIndex >= cols) {
+        currentGameIndex -= cols;
+        updateGameSelection(currentGameIndex);
+      }
+    } else if (e.key === 'ArrowDown') {
+      // Навигация вниз по сетке (5 колонок)
+      const cols = 5;
+      // Если на последней строке, перейти на кнопку mute
+      const rows = Math.ceil(gameIcons.length / cols);
+      const currentRow = Math.floor(currentGameIndex / cols);
+      if (currentRow === rows - 1 && currentGameIndex === gameIcons.length - 1) {
+        // Перейти на кнопку mute
+        window.isNavigatingMute = true;
+        toggleBtn.focus();
+        toggleBtn.classList.add('focused');
+        volumeControl.style.opacity = '1';
+        volumeControl.style.visibility = 'visible';
+        // Убрать выделение с иконок
+        gameIcons.forEach(icon => icon.classList.remove('selected'));
+      } else if (currentGameIndex + cols < gameIcons.length) {
+        currentGameIndex += cols;
+        updateGameSelection(currentGameIndex);
+      }
     } else if (e.key === 'Enter') {
-      const url = gameIcons[gameIndex].getAttribute('data-url');
-      if (url) {
+      const url = gameIcons[currentGameIndex].getAttribute('data-url');
+      if (url && url !== '—') {
         window.location.href = url;
       }
     }
@@ -265,8 +960,56 @@
 
 const music = document.getElementById('background-music');
 const toggleBtn = document.getElementById('music-toggle');
+const volumeControl = document.querySelector('.volume-control');
+const volumeFill = document.getElementById('volume-fill');
+const volumeHandle = document.getElementById('volume-handle');
+const volumeContainer = document.querySelector('.volume-slider-container');
 let isPlaying = false;
+let isMuteFocused = false;
+let volume = 1; // Громкость от 0 до 1
 
+// Инициализация громкости
+if (music) {
+  music.volume = volume;
+  updateVolumeDisplay();
+}
+
+// Обновление отображения громкости
+function updateVolumeDisplay() {
+  const percentage = volume * 100;
+  volumeFill.style.transform = `scaleX(${volume})`;
+  volumeHandle.style.left = `${percentage}%`;
+}
+
+// Управление громкостью через слайдер
+let isDragging = false;
+
+volumeContainer.addEventListener('mousedown', (e) => {
+  isDragging = true;
+  updateVolumeFromEvent(e);
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (isDragging) {
+    updateVolumeFromEvent(e);
+  }
+});
+
+document.addEventListener('mouseup', () => {
+  isDragging = false;
+});
+
+function updateVolumeFromEvent(e) {
+  const rect = volumeContainer.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const percentage = Math.max(0, Math.min(1, x / rect.width));
+  volume = percentage;
+  if (music) music.volume = volume;
+  updateVolumeDisplay();
+}
+
+
+// Клик по кнопке mute
 toggleBtn.addEventListener('click', () => {
   if (isPlaying) {
     music.pause();
@@ -277,6 +1020,96 @@ toggleBtn.addEventListener('click', () => {
   }
   isPlaying = !isPlaying;
 });
+
+// Фокус на кнопке mute
+toggleBtn.addEventListener('focus', () => {
+  isMuteFocused = true;
+  window.isNavigatingMute = true;
+  toggleBtn.classList.add('focused');
+  volumeControl.style.opacity = '1';
+  volumeControl.style.visibility = 'visible';
+});
+
+toggleBtn.addEventListener('blur', () => {
+  isMuteFocused = false;
+  if (!window.isNavigatingMute) {
+    toggleBtn.classList.remove('focused');
+    // Скрыть регулятор только если не наведена мышь
+    if (!volumeControl.matches(':hover')) {
+      volumeControl.style.opacity = '0';
+      volumeControl.style.visibility = 'hidden';
+    }
+  }
+});
+
+// Показать регулятор при наведении на него
+volumeControl.addEventListener('mouseenter', () => {
+  volumeControl.style.opacity = '1';
+  volumeControl.style.visibility = 'visible';
+});
+
+volumeControl.addEventListener('mouseleave', () => {
+  if (!isMuteFocused) {
+    volumeControl.style.opacity = '0';
+    volumeControl.style.visibility = 'hidden';
+  }
+});
+
+// Инициализация иконки музыки (по умолчанию выключена)
+toggleBtn.textContent = "🔇";
+
+// ========== ОБНОВЛЕНИЕ ДАТЫ И ВРЕМЕНИ ==========
+function updateDateTime() {
+  const now = new Date();
+  
+  // Форматирование даты (день/месяц)
+  const day = String(now.getDate()).padStart(2, '0');
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const dateStr = `${day}/${month}`;
+  
+  // Форматирование времени (часы:минуты)
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const timeStr = `${hours}:${minutes}`;
+  
+  // Обновление элементов
+  const dateElement = document.getElementById('current-date');
+  const timeElement = document.getElementById('current-time');
+  
+  if (dateElement) dateElement.textContent = dateStr;
+  if (timeElement) timeElement.textContent = timeStr;
+}
+
+// Обновление сразу при загрузке
+updateDateTime();
+
+// Обновление каждую минуту
+setInterval(updateDateTime, 60000);
+
+// секции
+const bottomIcons = document.querySelectorAll('.bottom-icon');
+const sections = document.querySelectorAll('.section');
+
+bottomIcons.forEach(icon => {
+  icon.addEventListener('click', () => {
+    // снять выделение со всех кнопок
+    bottomIcons.forEach(i => i.classList.remove('active'));
+    // выделить текущую
+    icon.classList.add('active');
+
+    // скрыть все секции
+    sections.forEach(sec => sec.classList.remove('active'));
+    // показать нужную
+    const target = icon.getAttribute('data-section');
+    document.getElementById('section-' + target).classList.add('active');
+  });
+});
+
+// По умолчанию активна секция "Домой" (уже установлено в HTML, но на всякий случай)
+const homeIcon = document.querySelector('.bottom-icon[data-section="home"]');
+if (homeIcon && !homeIcon.classList.contains('active')) {
+  homeIcon.classList.add('active');
+}
 
 
 </script>
