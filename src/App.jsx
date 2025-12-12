@@ -35,14 +35,12 @@ const Logo = ({ onLogoClick }) => {
   );
 };
 
-// Countdown Component с зимними эмодзи
 const Countdown = ({ onClick }) => {
   const [timeLeft, setTimeLeft] = useState('');
   const [winterEmojis] = useState(['❄️', '⛄', '🎄', '🎁', '🔔', '🧤', '🧣', '☃️', '🎅', '🤶']);
   const [currentEmoji, setCurrentEmoji] = useState('🎄');
 
   useEffect(() => {
-    // Меняем эмодзи каждые 3 секунды
     const emojiInterval = setInterval(() => {
       const randomEmoji = winterEmojis[Math.floor(Math.random() * winterEmojis.length)];
       setCurrentEmoji(randomEmoji);
@@ -171,23 +169,23 @@ const InfoItem = ({ label, value }) => {
   );
 };
 
-// Social Buttons Component с правильными путями
+// Social Buttons Component
 const SocialButtons = () => {
   const socials = [
     { 
       name: 'TikTok', 
       url: 'https://www.tiktok.com/@MS4wLjABAAAAFdLXg1ecsx-AwLS4skXMZxpD8ignWqoeMYw5Fh03V1RO62_YDqRYyrM3BtnQIcgi', 
-      icon: '/tiktok.png' // Локальный файл в public
+      icon: '/tiktok.png' 
     },
     { 
       name: 'Discord', 
       url: 'https://discord.com/users/1247751784139591701', 
-      icon: '/discord.png' // Локальный файл в public
+      icon: '/discord.png' 
     },
     { 
       name: 'GitHub', 
       url: 'https://github.com/ZinexDa', 
-      icon: '/github.png' // Локальный файл в public
+      icon: '/github.png' 
     }
   ];
 
@@ -235,14 +233,14 @@ const MuteButton = ({ isMuted, onToggle }) => {
   );
 };
 
-// Usagi Component (bunny popup)
+// Usagi Component
 const Usagi = ({ isVisible }) => {
   return (
     <img
       src="/zinex.gif"
       alt="Usagi"
       className={`fixed bottom-0 right-5 w-[200px] z-[9999] transition-transform duration-500
-                  ${isVisible ? '-translate-y-80' : 'translate-y-full'}`}
+                  ${isVisible ? '-translate-y-31' : 'translate-y-full'}`}
     />
   );
 };
@@ -298,7 +296,6 @@ export default function App() {
   const chirpsRef = useRef([]);
 
   useEffect(() => {
-    // Создаём аудио объекты для chirper звуков
     chirpsRef.current = [
       new Audio('/chirper1.ogg'),
       new Audio('/chirper2.ogg'),
@@ -324,7 +321,6 @@ export default function App() {
     
     setShowUsagi(true);
     
-    // Проигрываем случайный chirper звук
     const randomChirp = chirpsRef.current[Math.floor(Math.random() * chirpsRef.current.length)];
     randomChirp.currentTime = 0;
     randomChirp.play().catch(() => {});
