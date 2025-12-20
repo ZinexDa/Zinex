@@ -1,26 +1,28 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<html lang="ru">
+<head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>zinex.lol</title>
 
 <style>
 /* ---------------------- FONT ---------------------- */
 @font-face {
     font-family: 'ContinuumMedium';
-    src: url('ContinuumMedium.woff2') format('woff2');
+    src: url('ContinuumMedium.woff2') format('woff2'); 
     font-weight: normal;
     font-style: normal;
 }
 
 /* ---------------------- GLOBAL ---------------------- */
 body {
-    background: #111;
+    background: #0d0d0d;
     color: #fff;
     font-family: 'ContinuumMedium', sans-serif;
     text-align: center;
     padding-top: 40px;
     margin: 0;
+    overflow-x: hidden;
     opacity: 0;
     animation: fadeIn 1.2s ease forwards;
 }
@@ -31,12 +33,9 @@ h1 {
     font-size: 48px;
     margin: 20px 0 10px 0;
     cursor: pointer;
-}
-
-.subtitle {
-    font-size: 18px;
-    color: #bbb;
-    margin-bottom: 20px;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+    z-index: 10;
+    position: relative;
 }
 
 /* ---------------------- 3D LOGO ---------------------- */
@@ -46,38 +45,39 @@ h1 {
     max-width: 70%;
     margin-bottom: 15px;
     cursor: pointer;
-    
     border-radius: 50%;
     object-fit: cover;
-    
     will-change: transform;
     transition: all 0.3s ease;
     transform-style: preserve-3d;
     border: 3px solid #73b7ff; 
     box-shadow: 
-        0 0 20px rgba(115, 183, 255, 0.4),
+        0 0 30px rgba(115, 183, 255, 0.6),
         inset 0 0 20px rgba(115, 183, 255, 0.2); 
     padding: 8px; 
     background: rgba(26, 26, 26, 0.8);
+    position: relative;
+    z-index: 10;
 }
 
 .interactive-logo:hover {
-    transform: translateY(-8px) scale(1.08) rotateY(5deg);
+    transform: translateY(-8px) scale(1.08) rotateY(10deg);
     box-shadow: 
-        0 15px 35px rgba(115, 183, 255, 0.6),
-        inset 0 0 25px rgba(115, 183, 255, 0.3);
+        0 15px 50px rgba(115, 183, 255, 0.8),
+        inset 0 0 30px rgba(115, 183, 255, 0.4);
     border-color: #4a90e2; 
 }
 
 .interactive-logo:active {
     transform: translateY(-2px) scale(0.98);
-    transition: transform 0.1s ease;
 }
+
 /* ---------------------- 3D COUNTDOWN ---------------------- */
 #countdown-wrapper {
     position: relative;
     display: inline-block;
     perspective: 1000px;
+    z-index: 10;
 }
 
 #countdown {
@@ -86,17 +86,13 @@ h1 {
     margin: 10px 0 30px 0;
     cursor: pointer;
     position: relative;
-    z-index: 10;
-    text-shadow: 0 0 20px #ff00cc, 
-                 0 0 30px #ff0066,
-                 0 0 50px #ff0000;
+    text-shadow: 0 0 20px #ff00cc, 0 0 40px #ff0066;
     font-family: 'ContinuumMedium', monospace;
     color: #ffffff;
-    padding: 15px 25px;
+    padding: 15px 35px;
     border-radius: 15px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     
-    /* ★★★ 3D EFFECT ★★★ */
     will-change: transform;
     transition: all 0.3s ease;
     transform-style: preserve-3d;
@@ -106,273 +102,183 @@ h1 {
 
 #countdown:hover {
     transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 10px 30px rgba(255, 0, 204, 0.6);
+    box-shadow: 0 10px 40px rgba(255, 0, 204, 0.7);
 }
 
 #countdown:active {
     transform: translateY(0px) scale(0.95);
-    transition: transform 0.1s ease;
 }
 
 #countdown::after {
     content: "🎄";
     position: absolute;
-    right: -70px;
-    top: -5px;
+    right: -60px;
+    top: -10px;
     font-size: 32px;
     animation: blossomFloat 3s ease-in-out infinite;
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.8));
 }
 
-/* ---------------------- PANELS ---------------------- */
-.panel-container {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin: 30px auto;
-    flex-wrap: wrap;
-    max-width: 1000px;
+@keyframes blossomFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
 }
 
-.panel {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    padding: 25px;
-    border-radius: 12px;
-    width: 340px;
-    box-shadow: 0 0 25px rgba(0,0,0,0.4);
-    display: flex;
-    flex-direction: column;
-    text-align: left;
+/* ---------------------- BACKGROUND FIGURES (BLOSSOMS) ---------------------- */
+.blossom {
+    position: fixed; /* Фиксируем, чтобы летали по всему экрану */
+    font-size: 24px;
+    pointer-events: none;
+    z-index: 1; /* Позади контента */
+    opacity: 0.8;
+    filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.6));
 }
 
-.panel-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+@keyframes blossomFall {
+    0%   { transform: translateY(-50px) rotate(0); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 
-.panel-header img {
-    width: 32px;
-    height: 32px;
+/* ---------------------- MUTE & NAV BUTTONS ---------------------- */
+.nav-tabs {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  gap: 15px;
+  z-index: 10000;
 }
 
-.panel-header h2 {
-    color: #73b7ff;
-    font-size: 22px;
-    margin: 0;
-}
-
-.panel ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-}
-
-.panel ul li {
-    margin: 8px 0;
-    color: #ccc;
-}
-
-.price {
-    margin-top: 15px;
-    font-size: 18px;
+.action-btn {
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(5px);
     color: #fff;
-    font-weight: bold;
-}
-
-/* ---------------------- MOBILE PANEL FIX ---------------------- */
-@media (max-width: 480px) {
-    .panel {
-        width: 90%;
-        padding: 20px;
-    }
-    #countdown { font-size: 28px; }
-    h1 { font-size: 32px; }
-}
-
-/* ---------------------- 3D MUTE BUTTON ---------------------- */
-#muteButton {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    background: linear-gradient(45deg, #333, #555);
-    color: #fff;
-    border: 2px solid #73b7ff;
-    padding: 12px 18px;
+    border: 1px solid #73b7ff;
+    padding: 10px 20px;
     cursor: pointer;
+    font-family: 'ContinuumMedium', sans-serif;
     font-size: 14px;
     border-radius: 8px;
-    z-index: 10000;
-    
-    will-change: transform;
     transition: all 0.3s ease;
-    transform-style: preserve-3d;
-    box-shadow: 0 0 15px rgba(115, 183, 255, 0.3);
+    box-shadow: 0 0 10px rgba(115, 183, 255, 0.2);
 }
 
-#muteButton:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 5px 20px rgba(115, 183, 255, 0.5);
-    background: linear-gradient(45deg, #555, #777);
+.action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px rgba(115, 183, 255, 0.6);
+    background: rgba(50, 50, 50, 0.8);
+    border-color: #fff;
 }
 
-#muteButton:active {
-    transform: translateY(1px) scale(0.95);
-    transition: transform 0.1s ease;
-}
-
-/* ---------------------- USAGI ---------------------- */
-#usagi {
+#muteButton {
     position: fixed;
-    bottom: -300px;
-    right: 20px;
-    width: 200px;
-    z-index: 9999;
-    transition: transform 0.5s ease;
-    background: transparent;
+    top: 20px;
+    left: 20px;
+    z-index: 10000;
 }
 
-.slide-up { transform: translateY(-320px); }
-.slide-down { transform: translateY(300px); }
-
-/* ---------------------- PEAM POP ---------------------- */
-#peam {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 250px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.6s ease;
-    z-index: 10001;
-}
-
-#peam.show { opacity: 1; }
-
-/* ---------------------- BLOSSOMS ---------------------- */
-@keyframes blossomFall {
-    0%   { transform: translateY(-20px) rotate(0); opacity: 1; }
-    100% { transform: translateY(60px) rotate(360deg); opacity: 0; }
-}
-
-.blossom {
-    position: absolute;
-    font-size: 20px;
-    pointer-events: none;
-    z-index: 5;
-}
-/* ---------------------- 3D TILT CONTAINER ---------------------- */
+/* ---------------------- IMPROVED LIQUID GLASS PANEL ---------------------- */
 .tilt-container {
     perspective: 1000px;
-    margin: 30px auto;
+    margin: 40px auto;
     max-width: 500px;
+    width: 90%;
+    z-index: 10;
+    position: relative;
 }
 
 .info-panel {
-    background: rgba(26, 26, 26, 0.9);
-    border: 2px solid #73b7ff;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 0 25px rgba(115, 183, 255, 0.3);
-    backdrop-filter: blur(10px);
+    background: rgba(20, 20, 20, 0.35); /* Светлее и прозрачнее */
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 30px;
+    
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     
     will-change: transform;
-    transition: transform 0.1s ease-out;
     transform-style: preserve-3d;
-}
-
-.panel-header {
-    text-align: center;
-    margin-bottom: 20px;
-    transform: translateZ(20px);
 }
 
 .panel-header h2 {
     color: #73b7ff;
-    font-size: 24px;
-    margin: 0;
-    text-shadow: 0 0 10px rgba(115, 183, 255, 0.5);
-}
-
-.panel-content {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transform: translateZ(15px);
+    font-size: 26px;
+    margin: 0 0 20px 0;
+    text-shadow: 0 0 15px rgba(115, 183, 255, 0.6);
 }
 
 .info-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
-    border-bottom: 1px solid #333;
-    transition: all 0.3s ease;
-    transform: translateZ(10px);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .info-item:hover {
-    transform: translateZ(10px) translateX(5px);
+    background: rgba(255, 255, 255, 0.05);
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 8px;
+    transition: 0.3s;
 }
 
-.label {
-    color: #bbb;
-    font-weight: bold;
-    min-width: 100px;
-}
+.label { color: #ddd; font-weight: bold; }
+.value { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
 
-.value {
-    color: #fff;
-    flex-grow: 1;
-    text-align: right;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
 /* ---------------------- SOCIAL BUTTONS ---------------------- */
 .social-buttons {
     display: flex;
     justify-content: center;
-    gap: 20px;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #333;
-    transform: translateZ(15px);
+    gap: 25px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .social-btn {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #73b7ff, #4a90e2);
+    background: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    border: 2px solid #73b7ff;
-    box-shadow: 0 0 15px rgba(115, 183, 255, 0.4);
-    transform: translateZ(20px);
+    border: 1px solid rgba(115, 183, 255, 0.5);
 }
 
 .social-btn:hover {
-    transform: translateZ(20px) scale(1.1) translateY(-3px);
-    box-shadow: 0 5px 20px rgba(115, 183, 255, 0.6);
-    background: linear-gradient(45deg, #4a90e2, #73b7ff);
+    transform: translateY(-5px) scale(1.1);
+    background: #73b7ff;
+    box-shadow: 0 0 25px rgba(115, 183, 255, 0.9);
+    border-color: #fff;
 }
 
 .social-btn img {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     filter: brightness(0) invert(1);
-    transition: transform 0.3s ease;
 }
 
-.social-btn:hover img {
-    transform: scale(1.1);
+/* ---------------------- USAGI & PEAM ---------------------- */
+#usagi {
+    position: fixed;
+    bottom: -350px;
+    right: 20px;
+    width: 200px;
+    z-index: 9999;
+    transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
+.slide-up { transform: translateY(-350px); }
+.slide-down { transform: translateY(350px); }
 
-/* ---------------------- FULLSCREEN MUSIC OVERLAY ---------------------- */
+/* ---------------------- MUSIC OVERLAY ---------------------- */
 #musicOverlay {
     position: fixed;
     top: 0;
@@ -385,108 +291,52 @@ h1 {
     justify-content: center;
     z-index: 100000;
     cursor: pointer;
-    transition: all 0.5s ease;
-}
-
-#musicOverlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(1.1);
+    transition: opacity 0.8s ease;
 }
 
 .music-content h1 {
-    color: #ffffff;
-    font-family: 'ContinuumMedium', sans-serif;
     font-size: 2.5rem;
-    text-align: center;
-    text-shadow: 0 0 20px #73b7ff;
     animation: pulseText 2s ease-in-out infinite;
-    cursor: pointer;
-    filter: none !important;
-    backdrop-filter: none !important;
 }
 
 @keyframes pulseText {
-    0%, 100% { 
-        opacity: 0.8;
-        transform: scale(1);
-    }
-    50% { 
-        opacity: 1;
-        transform: scale(1.05);
-        text-shadow: 0 0 30px #ff00cc;
-    }
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); text-shadow: 0 0 30px #ff00cc; }
 }
 
-body:not(.music-started) .tilt-container-logo,
-body:not(.music-started) h1,
-body:not(.music-started) .tilt-container-timer,
-body:not(.music-started) .tilt-container {
-    opacity: 0.1; 
+body:not(.music-started) .main-content {
+    opacity: 0.1;
+    filter: blur(5px);
     pointer-events: none;
-    filter: none !important;
-    backdrop-filter: none !important;
+    transition: all 1s ease;
 }
 
-body.music-started .tilt-container-logo,
-body.music-started h1, 
-body.music-started .tilt-container-timer,
-body.music-started .tilt-container {
+body.music-started .main-content {
     opacity: 1;
+    filter: blur(0);
     pointer-events: all;
-    transition: all 0.8s ease;
-    filter: none !important;
-    backdrop-filter: none !important;
 }
 
-/* ---------------------- CANVAS VISUALIZER soon ---------------------- */
+/* ---------------------- VISUALIZER ---------------------- */
 #canvasVisualizer {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 0; /* Под контентом */
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 1; /* Яркость полная */
 }
 
-/* ---------------------- dfsad --------- */
-.nav-tabs {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  gap: 10px;
-  z-index: 10000;
+/* Mobile Fixes */
+@media (max-width: 480px) {
+    h1 { font-size: 32px; }
+    #countdown { font-size: 24px; padding: 10px 20px; }
+    .interactive-logo { width: 180px; height: 180px; }
+    .nav-tabs { top: auto; bottom: 20px; right: 50%; transform: translateX(50%); }
+    #muteButton { top: 20px; left: 20px; }
 }
-
-.nav-btn {
-  background: linear-gradient(45deg, #333, #555);
-  color: #fff;
-  border: 2px solid #73b7ff;
-  padding: 12px 18px;
-  cursor: pointer;
-  font-size: 14px;
-  border-radius: 8px;
-  will-change: transform;
-  transition: all 0.3s ease;
-  transform-style: preserve-3d;
-  box-shadow: 0 0 15px rgba(115, 183, 255, 0.3);
-}
-
-.nav-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 5px 20px rgba(115, 183, 255, 0.5);
-  background: linear-gradient(45deg, #555, #777);
-}
-
-.nav-btn:active {
-  transform: translateY(1px) scale(0.95);
-  transition: transform 0.1s ease;
-}
-
-
 </style>
 </head>
 
@@ -504,76 +354,78 @@ body.music-started .tilt-container {
     <source src="zinex.lol_files/background-music.mp3" type="audio/mpeg">
 </audio>
 
-<div class="tilt-container-logo">
-    <img src="zinex.lol_files/zendex.png" class="logo interactive-logo" alt="Zendex Logo">
-</div>
-<h1>woooooooooooooooow</h1>
+<button id="muteButton" class="action-btn">🔇</button>
 
 <div class="nav-tabs">
-  <button class="nav-btn" onclick="location.href='zinex.lol.html'">Главная</button>
-  <button class="nav-btn" onclick="location.href='consoleDS.html'">Меню</button>
+  <button class="action-btn" onclick="location.href='zinex.lol.html'">Главная</button>
+  <button class="action-btn" onclick="location.href='consoleDS.html'">Меню</button>
 </div>
 
-
-<div class="tilt-container-timer">
-    <div id="countdown-wrapper">
-        <div id="countdown">00:00:00</div>
+<div class="main-content">
+    
+    <div class="tilt-container-logo">
+        <img src="zinex.lol_files/zendex.png" class="logo interactive-logo" alt="Zendex Logo">
     </div>
-</div>
+    
+    <h1>woooooooooooooooow</h1>
 
-<!-- info -->
-<div class="tilt-container">
-    <div class="info-panel">
-        <div class="panel-header">
-            <h2>Bio</h2>
-        </div>
-        <div class="panel-content">
-            <div class="info-item">
-                <span class="label">name??????:</span>
-                <span class="value">Zinex</span>
-            </div>
-            <div class="info-item">
-                <span class="label">my miiverse</span>
-                <span class="value">idk</span>
-            </div>
-            <div class="info-item">
-                <span class="label">langugugages:</span>
-                <span class="value">э lua ну забыл этот ещё godotscript</span>
-            </div>
-            <div class="info-item">
-                <span class="label">Сайт:</span>
-                <span class="value">zinexda.github.io/Zinex</span>
-            </div>
-        </div>
-        <!-- info buttons -->
-        <div class="social-buttons">
-            <a href="https://www.tiktok.com/@MS4wLjABAAAAFdLXg1ecsx-AwLS4skXMZxpD8ignWqoeMYw5Fh03V1RO62_YDqRYyrM3BtnQIcgi" target="_blank" class="social-btn">
-                <img src="zinex.lol_files/tiktok.png" alt="TikTok">
-            </a>
-            <a href="https://discord.com/users/1247751784139591701" target="_blank" class="social-btn">
-                <img src="zinex.lol_files/discord.png" alt="Discord">
-            </a>
-            <a href="https://github.com/ZinexDa" target="_blank" class="social-btn">
-                <img src="zinex.lol_files/github.png" alt="GitHub">
-            </a>
+    <div class="tilt-container-timer">
+        <div id="countdown-wrapper">
+            <div id="countdown">00:00:00</div>
         </div>
     </div>
+
+    <div class="tilt-container">
+        <div class="info-panel">
+            <div class="panel-header">
+                <h2>Bio</h2>
+            </div>
+            <div class="panel-content">
+                <div class="info-item">
+                    <span class="label">Name:</span>
+                    <span class="value">Zinex</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Miiverse:</span>
+                    <span class="value">idk</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Languages:</span>
+                    <span class="value">Lua, GodotScript</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Site:</span>
+                    <span class="value">zinexda.github.io/Zinex</span>
+                </div>
+            </div>
+            <div class="social-buttons">
+                <a href="https://www.tiktok.com/@MS4wLjABAAAAFdLXg1ecsx-AwLS4skXMZxpD8ignWqoeMYw5Fh03V1RO62_YDqRYyrM3BtnQIcgi" target="_blank" class="social-btn">
+                    <img src="zinex.lol_files/tiktok.png" alt="TikTok">
+                </a>
+                <a href="https://discord.com/users/1247751784139591701" target="_blank" class="social-btn">
+                    <img src="zinex.lol_files/discord.png" alt="Discord">
+                </a>
+                <a href="https://github.com/ZinexDa" target="_blank" class="social-btn">
+                    <img src="zinex.lol_files/github.png" alt="GitHub">
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <img id="usagi" src="zinex.lol_files/zinex.gif" class="slide-down">
-<img id="peam" src="zinex.lol_files/peam.png">
-
-<button id="muteButton">🔇</button>
 
 <script>
 /* ----------------------------------------------------------
-   audio
+   SETUP
 ----------------------------------------------------------- */
 const musicOverlay = document.getElementById("musicOverlay");
 const bgm = document.getElementById("bgm");
+const muteButton = document.getElementById("muteButton");
+const usagi = document.getElementById("usagi");
 
-musicOverlay.style.display = 'flex';
-
+// Звуки (без папки, так как обычно они рядом, или добавь zinex.lol_files/ если они там)
 const chirps = [
     new Audio("chirper1.ogg"),
     new Audio("chirper2.ogg"), 
@@ -585,36 +437,37 @@ chirps.forEach(c => {
     c.volume = 0.7;
 });
 
+/* ----------------------------------------------------------
+   START
+----------------------------------------------------------- */
 musicOverlay.addEventListener('click', function() {
-    console.log("starting");
-
-    this.style.display = 'none';
-
+    this.style.opacity = '0';
+    this.style.pointerEvents = 'none';
     document.body.classList.add("music-started");
     
     if (bgm) {
         bgm.volume = 0.5;
         bgm.play().then(() => {
-            console.log("music started wooww");
+            muteButton.textContent = "🔈";
         }).catch(error => {
-            console.log("error music", error);
-
-            const errorMsg = document.createElement('div');
-            errorMsg.innerHTML = '❌ Music error - file not found';
-            errorMsg.style.cssText = 'position:fixed; top:10px; left:10px; background:red; color:white; padding:10px; z-index:100001;';
-            document.body.appendChild(errorMsg);
-            setTimeout(() => errorMsg.remove(), 3000);
+            console.log("Audio play failed", error);
         });
     }
 });
 
-/* ----------------------------------------------------------
-   USAGI POP-UP
------------------------------------------------------------ */
-const usagi = document.getElementById("usagi");
+if (muteButton && bgm) {
+    muteButton.addEventListener('click', function() {
+        bgm.muted = !bgm.muted;
+        this.textContent = bgm.muted ? "🔇" : "🔈";
+    });
+}
 
-if (usagi) {
-    document.querySelector(".interactive-logo").addEventListener("click", function() {
+/* ----------------------------------------------------------
+   USAGI
+----------------------------------------------------------- */
+const logo = document.querySelector(".interactive-logo");
+if (usagi && logo) {
+    logo.addEventListener("click", function() {
         if (!document.body.classList.contains('music-started')) return;
         
         usagi.classList.remove("slide-down");
@@ -632,7 +485,7 @@ if (usagi) {
 }
 
 /* ----------------------------------------------------------
-   NEW YEAR COUNTDOWN
+   COUNTDOWN
 ----------------------------------------------------------- */
 function updateNewYearCountdown() {
     const now = new Date();
@@ -640,8 +493,11 @@ function updateNewYearCountdown() {
     const newYear = new Date(currentYear + 1, 0, 1);
     const timeLeft = newYear - now;
     
+    const cdEl = document.getElementById("countdown");
+    if (!cdEl) return;
+
     if (timeLeft <= 0) {
-        document.getElementById("countdown").textContent = "🎉 С НОВЫМ ГОДОМ! 🎉";
+        cdEl.textContent = "🎉 HAPPY NEW YEAR! 🎉";
         return;
     }
     
@@ -650,14 +506,8 @@ function updateNewYearCountdown() {
     const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
     
-    const countdownText = `${days}д ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    const countdown = document.getElementById("countdown");
-    if (countdown) {
-        countdown.textContent = countdownText;
-    }
+    cdEl.textContent = `${days}д ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
 }
-
 setInterval(updateNewYearCountdown, 1000);
 updateNewYearCountdown();
 
@@ -681,59 +531,54 @@ function spawnFallingPeam() {
         img.style.opacity = "0";
     });
 
-    setTimeout(() => {
-        if (img.parentNode) {
-            img.parentNode.removeChild(img);
+    setTimeout(() => { img.remove(); }, 2500);
+}
+
+const cdWrapper = document.getElementById("countdown");
+if (cdWrapper) {
+    cdWrapper.addEventListener("click", (e) => {
+        if (!document.body.classList.contains('music-started')) return;
+        e.stopPropagation();
+        const burst = 6 + Math.floor(Math.random() * 5);
+        for (let i = 0; i < burst; i++) {
+            setTimeout(spawnFallingPeam, i * 120);
         }
-    }, 2500);
+    });
 }
 
 /* ----------------------------------------------------------
-   CLICK COUNTDOWN = FALLING PEAM BURST
------------------------------------------------------------ */
-document.addEventListener('DOMContentLoaded', function() {
-    const countdown = document.getElementById("countdown");
-    if (countdown) {
-        countdown.addEventListener("click", (e) => {
-            if (!document.body.classList.contains('music-started')) return;
-            
-            e.stopPropagation();
-            const burst = 6 + Math.floor(Math.random() * 5);
-            for (let i = 0; i < burst; i++) {
-                setTimeout(spawnFallingPeam, i * 120);
-            }
-        });
-    }
-});
-
-/* ----------------------------------------------------------
-   BLOSSOMS BEHIND COUNTDOWN
+   FALLING BACKGROUND FIGURES (BLOSSOMS) - RESTORED
 ----------------------------------------------------------- */
 function spawnBlossom() {
-    const wrapper = document.getElementById("countdown-wrapper");
-    if (!wrapper) return;
-    
     const blossom = document.createElement("div");
     blossom.className = "blossom";
     
     const emojis = ["⛄","🎄","🌨️","☃️","❄️","🎁","✨","🌟"];
     blossom.textContent = emojis[Math.floor(Math.random() * emojis.length)];
     
-    blossom.style.left = (Math.random() * wrapper.offsetWidth) + "px";
-    blossom.style.top = "-20px";
-    blossom.style.animation = "blossomFall 4s linear forwards";
+    blossom.style.left = (Math.random() * window.innerWidth) + "px";
+    blossom.style.top = "-50px";
+    // Случайная скорость падения
+    const duration = 4 + Math.random() * 5; 
+    blossom.style.animation = `blossomFall ${duration}s linear forwards`;
     
-    wrapper.appendChild(blossom);
+    document.body.appendChild(blossom);
+    
     setTimeout(() => {
-        if (blossom.parentNode) {
-            blossom.parentNode.removeChild(blossom);
-        }
-    }, 4000);
+        blossom.remove();
+    }, duration * 1000);
 }
-setInterval(spawnBlossom, 1300);
+
+// Запускаем падение фигур, если музыка началась
+setInterval(() => {
+    if (document.body.classList.contains('music-started')) {
+        spawnBlossom();
+    }
+}, 1000);
+
 
 /* ----------------------------------------------------------
-   3D MOUSE TILT EFFECT
+   3D TILT
 ----------------------------------------------------------- */
 function init3DTilt() {
     const panel = document.querySelector('.info-panel');
@@ -742,62 +587,25 @@ function init3DTilt() {
     if (!panel || !container) return;
     
     container.addEventListener('mousemove', (e) => {
-        const { left, top, width, height } = container.getBoundingClientRect();
+        const rect = container.getBoundingClientRect();
+        const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+        const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
         
-        const mouseX = (e.clientX - left) / width - 0.5;
-        const mouseY = (e.clientY - top) / height - 0.5;
+        const rotateY = mouseX * 15; 
+        const rotateX = -mouseY * 15;
         
-        const rotateY = mouseX * 10;
-        const rotateX = -mouseY * 5;
-        const translateZ = 10;
-        
-        panel.style.transform = `
-            rotateY(${rotateY}deg) 
-            rotateX(${rotateX}deg) 
-            translateZ(${translateZ}px)
-        `;
-        
-        const shadowX = mouseX * 20;
-        const shadowY = mouseY * 10;
-        panel.style.boxShadow = `
-            ${shadowX}px ${shadowY}px 25px rgba(115, 183, 255, 0.3),
-            0 0 30px rgba(115, 183, 255, 0.2)
-        `;
+        panel.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateZ(10px)`;
     });
     
     container.addEventListener('mouseleave', () => {
         panel.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
-        panel.style.boxShadow = '0 0 25px rgba(115, 183, 255, 0.3)';
-        
-        panel.style.transition = 'transform 0.5s ease, box-shadow 0.5s ease';
-        setTimeout(() => {
-            panel.style.transition = 'transform 0.1s ease-out';
-        }, 500);
     });
 }
-
-document.addEventListener('DOMContentLoaded', init3DTilt);
-
 document.addEventListener('DOMContentLoaded', init3DTilt);
 
 /* ----------------------------------------------------------
-   MUTEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+   VISUALIZER FIXED (SINGLE & BRIGHT)
 ----------------------------------------------------------- */
-if (muteButton && bgm) {
-    muteButton.addEventListener('click', function() {
-        const wasMuted = bgm.muted;
-        bgm.muted = !wasMuted;
-        this.textContent = bgm.muted ? "🔇" : "🔈";
-        
-        if (bgm.muted) {
-            console.log("🔇 off");
-        } else {
-            console.log("🔈 on");
-        }
-    });
-}
-
-// === КРУГЛЫЙ ВИЗУАЛИЗАТОР ===
 const canvas = document.getElementById('canvasVisualizer');
 const ctx = canvas.getContext('2d');
 
@@ -811,46 +619,52 @@ window.addEventListener('resize', resizeCanvas);
 let rotation = 0;
 const barCount = 64;
 
-function drawBar(x, y, angle, height) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(angle);
-  ctx.fillStyle = '#73b7ff';
-  ctx.fillRect(-2, 0, 4, height);
-  ctx.restore();
-}
-
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // находим центр логотипа
-  const logo = document.querySelector('.interactive-logo');
-  const rect = logo.getBoundingClientRect();
-  const centerX = rect.left + rect.width / 2;
-  const centerY = rect.top + rect.height / 2;
-  const radius = rect.width / 2 + 15; // круг чуть больше логотипа
+  const logoEl = document.querySelector('.interactive-logo');
+  
+  if (logoEl) {
+      const rect = logoEl.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const radius = rect.width / 2 + 30; 
 
-  ctx.save();
-  ctx.translate(centerX, centerY);
-  rotation += 0.01;
+      rotation += 0.005;
 
-  for (let i = 0; i < barCount; i++) {
-    const angle = (i * Math.PI * 2) / barCount + rotation;
-    const x = Math.cos(angle) * radius;
-    const y = Math.sin(angle) * radius;
-    const height = 20 + Math.sin(Date.now()/300 + i) * 40;
-    drawBar(x, y, angle, height);
+      // SINGLE LOOP - FIXED
+      for (let i = 0; i < barCount; i++) {
+        const angle = (i * Math.PI * 2) / barCount + rotation;
+        const x = centerX + Math.cos(angle) * radius;
+        const y = centerY + Math.sin(angle) * radius;
+        
+        // Высота прыгает рандомно (симуляция музыки)
+        const height = 15 + Math.sin(Date.now()/300 + i * 0.5) * 40;
+        
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle);
+        
+        // Свечение (светлые фигуры)
+        ctx.shadowBlur = 25;
+        ctx.shadowColor = '#4a90e2';
+        
+        ctx.fillStyle = '#73b7ff';
+        ctx.fillRect(-2, 0, 5, height);
+        
+        // Яркий центр
+        ctx.fillStyle = '#ffffff';
+        ctx.globalAlpha = 0.6;
+        ctx.fillRect(-1, 0, 2, height * 0.8);
+        
+        ctx.restore();
+      }
   }
 
-  ctx.restore();
   requestAnimationFrame(animate);
 }
-animate();
+document.addEventListener('DOMContentLoaded', animate);
 
-
-/* --- credits: usagi --- */
 </script>
-
-
-
-</body></html>
+</body>
+</html>
