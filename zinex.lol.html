@@ -228,13 +228,6 @@ h1 {
     transform: translateY(-1px);
 }
 
-#muteButton {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 10000;
-}
-
 /* ---------------------- IMPROVED LIQUID GLASS PANEL ---------------------- */
 .tilt-container {
     perspective: 1000px;
@@ -498,12 +491,6 @@ body.music-started .main-content {
         font-size: 13px;
     }
     
-    #muteButton {
-        top: 15px;
-        left: 15px;
-        padding: 10px 18px;
-    }
-    
     .tilt-container {
         max-width: 90%;
         margin: 30px auto;
@@ -607,13 +594,6 @@ body.music-started .main-content {
         max-width: 120px;
     }
     
-    #muteButton {
-        top: 10px;
-        left: 10px;
-        padding: 8px 14px;
-        font-size: 12px;
-    }
-    
     .tilt-container {
         max-width: 95%;
         margin: 20px auto;
@@ -712,11 +692,6 @@ body.music-started .main-content {
         font-size: 11px;
     }
     
-    #muteButton {
-        padding: 6px 10px;
-        font-size: 11px;
-    }
-    
     .info-panel {
         padding: 15px;
     }
@@ -785,28 +760,225 @@ body.music-started .main-content {
         width: 100px;
     }
 }
+/* ---------------------- ПРОИГРЫВАТель ---------------------- */
+#player-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    width: 420px; 
+    max-width: 90vw;
+    background: linear-gradient(135deg, rgba(23, 23, 23, 0.9), rgba(40, 40, 40, 0.9));
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(115, 183, 255, 0.3);
+    border-radius: 20px; 
+    padding: 15px;
+    z-index: 10001;
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 
+        0 10px 30px rgba(0,0,0,0.6), 
+        inset 0 0 15px rgba(115,183,255,0.15);
+}
+
+.player-hidden { transform: translateX(-150%); opacity: 0; }
+
+/* Диск с серым градиентом */
+.cd-wrapper {
+    position: relative;
+    width: 70px; 
+    height: 70px;
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+.cd-disk {
+    width: 100%;
+    height: 100%;
+    background: repeating-radial-gradient(
+      #444 0, 
+      #333 2px, 
+      #444 4px
+    );
+    border-radius: 50%;
+    border: 2px solid #73b7ff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.8), inset 0 0 10px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+/* Блик на диске для реалистичности */
+.cd-disk::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0.1) 100%);
+    pointer-events: none;
+}
+
+/* Дырка в центре */
+.cd-disk::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18px; height: 18px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    border: 2px solid rgba(115, 183, 255, 0.5);
+}
+
+.rotating { animation: spin 4s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.player-controls {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1;
+    gap: 6px;
+    overflow: hidden; 
+}
+
+.track-info {
+    font-size: 14px;
+    color: #fff;
+    text-shadow: 0 0 5px rgba(115,183,255,0.8);
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+}
+
+/* Секция прогресс бара и времени */
+.progress-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.time-text {
+    font-size: 10px;
+    font-family: monospace;
+    color: #bbb;
+    min-width: 35px; 
+}
+
+/* Стилизация ползунков */
+input[type=range] {
+    -webkit-appearance: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Ползунок прогресса */
+#progressSlider {
+    flex-grow: 1;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+}
+#progressSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+    background: #73b7ff;
+    box-shadow: 0 0 5px #73b7ff;
+    margin-top: -3px; 
+}
+#progressSlider::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+}
+
+/* Нижняя панель (кнопки + громкость) */
+.bottom-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.control-buttons { display: flex; gap: 15px; align-items: center; }
+
+.player-btn {
+    background: none;
+    border: none;
+    color: #ddd;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    padding: 0;
+}
+.player-btn:hover { color: #73b7ff; transform: scale(1.2); text-shadow: 0 0 8px #73b7ff; }
+
+.volume-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+#volumeSlider {
+    width: 60px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+}
+#volumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 8px;
+    width: 8px;
+    border-radius: 50%;
+    background: #fff;
+    margin-top: -2px;
+}
+
+/* ---------------------- ПАРТИКЛЫ НОТ ---------------------- */
+.note-particle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    color: #73b7ff;
+    font-size: 20px;
+    font-family: "Segoe UI Emoji", sans-serif;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    
+    text-shadow: 0 0 10px rgba(115, 183, 255, 0.8), 0 0 20px rgba(115, 183, 255, 0.4);
+    
+    animation: floatNote var(--duration) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+@keyframes floatNote {
+    0% {
+        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(var(--rStart));
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--rEnd));
+    }
+}
 </style>
 </head>
 
 <body>
 
-<div id="musicOverlay">
-    <div class="music-content">
-        <h1>click to play music</h1>
-    </div>
-</div>
-
 <canvas id="canvasVisualizer"></canvas>
-
-<audio id="bgm" loop>
-    <source src="zinex.lol_files/background-music.mp3" type="audio/mpeg">
-</audio>
-
-<button id="muteButton" class="action-btn">🔇</button>
 
 <div class="nav-tabs">
   <button class="action-btn" onclick="location.href='zinex.lol.html'">Главная</button>
-  <button class="action-btn" onclick="location.href='consoleDS.html'">Меню</button>
+  <a href="https://zeonix-launcher-site.vercel.app" target="_blank">
+    <button class="action-btn">Zeonix Launcher</button>
+</a>
 </div>
 
 <div class="main-content">
@@ -834,12 +1006,12 @@ body.music-started .main-content {
                     <span class="value">Zinex</span>
                 </div>
                 <div class="info-item">
-                    <span class="label">Miiverse:</span>
-                    <span class="value">idk</span>
+                    <span class="label">My projects:</span>
+                    <span class="value">Zeonix Launcher, </span>
                 </div>
                 <div class="info-item">
                     <span class="label">Languages:</span>
-                    <span class="value">Lua, GodotScript</span>
+                    <span class="value">Lua, GodotScript, JS, Kotlin</span>
                 </div>
                 <div class="info-item">
                     <span class="label">Site:</span>
@@ -864,7 +1036,46 @@ body.music-started .main-content {
 
 <img id="usagi" src="zinex.lol_files/zinex.gif" class="slide-down">
 
+<div id="musicOverlay">
+    <div class="music-content">
+        <h1 style="animation: pulseText 2s infinite;">click to play music</h1>
+    </div>
+</div>
+
+<audio id="bgm" loop></audio> 
+
+<div id="player-container" class="player-hidden">
+    <div class="cd-wrapper">
+        <div id="cd-disk" class="cd-disk"></div>
+        <div id="notes-container"></div>
+    </div>
+    
+    <div class="player-controls">
+        <div class="track-info" id="current-track-name">Загрузка...</div>
+        
+        <div class="progress-section">
+            <span id="currentTime" class="time-text">0:00</span>
+            <input type="range" id="progressSlider" min="0" value="0" step="0.1">
+            <span id="totalTime" class="time-text">0:00</span>
+        </div>
+
+        <div class="bottom-controls">
+            <div class="control-buttons">
+                <button class="player-btn" onclick="prevTrack()">⏮</button>
+                <button id="playPauseBtn" class="player-btn" onclick="togglePlay()">⏸</button>
+                <button class="player-btn" onclick="nextTrack()">⏭</button>
+            </div>
+            
+            <div class="volume-wrapper">
+                <span style="font-size:12px; color:#aaa;">🔈</span>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+
 /* ----------------------------------------------------------
    SETUP
 ----------------------------------------------------------- */
@@ -872,6 +1083,9 @@ const musicOverlay = document.getElementById("musicOverlay");
 const bgm = document.getElementById("bgm");
 const muteButton = document.getElementById("muteButton");
 const usagi = document.getElementById("usagi");
+const progressSlider = document.getElementById("progressSlider");
+const currentTimeEl = document.getElementById("currentTime");
+const totalTimeEl = document.getElementById("totalTime");
 
 const chirps = [
     new Audio("chirper1.ogg"),
@@ -884,30 +1098,38 @@ chirps.forEach(c => {
     c.volume = 0.7;
 });
 
+function formatTime(seconds) {
+    if (isNaN(seconds)) return "0:00";
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 /* ----------------------------------------------------------
    START
 ----------------------------------------------------------- */
 musicOverlay.addEventListener('click', function() {
     this.style.opacity = '0';
     this.style.pointerEvents = 'none';
+
     document.body.classList.add("music-started");
+    
+    if (playerContainer) {
+        playerContainer.classList.remove("player-hidden");
+    }
+
+    loadTrack(currentSongIndex); 
     
     if (bgm) {
         bgm.volume = 0.5;
         bgm.play().then(() => {
-            muteButton.textContent = "🔈";
+            if (cdDisk) cdDisk.classList.add("rotating");
+            if (playPauseBtn) playPauseBtn.textContent = "⏸";
         }).catch(error => {
-            console.log("Audio play failed", error);
+            console.log("Ошибка воспроизведения:", error);
         });
     }
 });
-
-if (muteButton && bgm) {
-    muteButton.addEventListener('click', function() {
-        bgm.muted = !bgm.muted;
-        this.textContent = bgm.muted ? "🔇" : "🔈";
-    });
-}
 
 /* ----------------------------------------------------------
    USAGI
@@ -929,6 +1151,56 @@ if (usagi && logo) {
             usagi.classList.add("slide-down");
         }, 4000);
     });
+}
+
+/* ----------------------------------------------------------
+   ГЕНЕРАТОР ПАРТИКЛОВ НОТ
+----------------------------------------------------------- */
+function spawnNote() {
+    const audioEl = document.getElementById("bgm");
+    if (!audioEl || audioEl.paused || document.getElementById("player-container").classList.contains("player-hidden")) return;
+    
+    const container = document.getElementById("notes-container");
+    if (!container) return;
+
+    const note = document.createElement("div");
+    note.className = "note-particle";
+    
+    const icons = ["♪", "♫", "♬", "♩", "𝄢"];
+    note.textContent = icons[Math.floor(Math.random() * icons.length)];
+
+    const angleDeg = -30 - Math.random() * 120; 
+    const angleRad = angleDeg * (Math.PI / 180);
+
+    const distance = 60 + Math.random() * 60;
+
+    const tx = Math.cos(angleRad) * distance;
+    const ty = Math.sin(angleRad) * distance;
+
+    const rStart = (Math.random() * 40 - 20) + "deg";
+    const rEnd = (Math.random() * 180 - 90) + "deg";
+
+    const duration = 1.5 + Math.random() * 1 + "s";
+
+    note.style.setProperty('--tx', `${tx}px`);
+    note.style.setProperty('--ty', `${ty}px`);
+    note.style.setProperty('--rStart', rStart);
+    note.style.setProperty('--rEnd', rEnd);
+    note.style.setProperty('--duration', duration);
+
+    container.appendChild(note);
+    
+    setTimeout(() => {
+        note.remove();
+    }, parseFloat(duration) * 1000);
+}
+
+setInterval(spawnNote, 400);
+
+function burstNotes() {
+    for(let i=0; i<8; i++) {
+        setTimeout(spawnNote, i * 50);
+    }
 }
 
 /* ----------------------------------------------------------
@@ -957,6 +1229,38 @@ function updateNewYearCountdown() {
 }
 setInterval(updateNewYearCountdown, 1000);
 updateNewYearCountdown();
+
+/* ----------------------------------------------------------
+   ОБНОВЛЕНИЕ ПЛЕЕРА
+----------------------------------------------------------- */
+bgm.addEventListener('timeupdate', () => {
+    if (document.activeElement !== progressSlider) {
+        progressSlider.value = bgm.currentTime;
+    }
+    currentTimeEl.textContent = formatTime(bgm.currentTime);
+});
+
+bgm.addEventListener('loadedmetadata', () => {
+    progressSlider.max = bgm.duration;
+    totalTimeEl.textContent = formatTime(bgm.duration);
+});
+
+progressSlider.addEventListener('input', () => {
+    currentTimeEl.textContent = formatTime(progressSlider.value);
+    bgm.currentTime = progressSlider.value;
+});
+
+function loadTrack(index) {
+    if (index < 0 || index >= songs.length) index = 0;
+    const song = songs[index];
+    bgm.src = song.src;
+    bgm.load(); 
+    trackNameDisplay.textContent = song.name;
+    
+    progressSlider.value = 0;
+    currentTimeEl.textContent = "0:00";
+    totalTimeEl.textContent = "..."; 
+}
 
 /* ----------------------------------------------------------
    FALLING PEAM
@@ -1105,6 +1409,99 @@ function animate() {
   requestAnimationFrame(animate);
 }
 document.addEventListener('DOMContentLoaded', animate);
+
+/* ----------------------------------------------------------
+   плеер
+----------------------------------------------------------- */
+const songs = [
+    { name: "iiSU", src: "zinex.lol_files/iiSU.mp3" },
+    { name: "game", src: "zinex.lol_files/game.mp3" },
+    { name: "Норм", src: "zinex.lol_files/Норм.mp3" }
+];
+
+let currentSongIndex = 0;
+
+const playerContainer = document.getElementById("player-container");
+const cdDisk = document.getElementById("cd-disk");
+const trackNameDisplay = document.getElementById("current-track-name");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const volumeSlider = document.getElementById("volumeSlider");
+
+function loadTrack(index) {
+    const song = songs[index];
+    const audioEl = document.getElementById("bgm"); 
+    audioEl.src = song.src;
+    trackNameDisplay.textContent = song.name;
+}
+
+function togglePlay() {
+    const audioEl = document.getElementById("bgm");
+    if (audioEl.paused) {
+        audioEl.play();
+        playPauseBtn.textContent = "⏸";
+        cdDisk.classList.add("rotating");
+    } else {
+        audioEl.pause();
+        playPauseBtn.textContent = "▶";
+        cdDisk.classList.remove("rotating");
+    }
+}
+
+function nextTrack() {
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
+    loadTrack(currentSongIndex);
+    document.getElementById("bgm").play();
+    playPauseBtn.textContent = "⏸";
+    cdDisk.classList.add("rotating");
+}
+
+function prevTrack() {
+    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+    loadTrack(currentSongIndex);
+    document.getElementById("bgm").play();
+    playPauseBtn.textContent = "⏸";
+    cdDisk.classList.add("rotating");
+}
+
+function spawnNote() {
+    const audioEl = document.getElementById("bgm");
+    if (!audioEl || audioEl.paused) return;
+    
+    const container = document.getElementById("notes-container");
+    if (!container) return;
+
+    const note = document.createElement("div");
+    note.className = "note";
+    const icons = ["♪", "♫", "♬", "♩"];
+    note.textContent = icons[Math.floor(Math.random() * icons.length)];
+    note.style.left = Math.random() * 30 + "px";
+    container.appendChild(note);
+    setTimeout(() => note.remove(), 2000);
+}
+setInterval(spawnNote, 600);
+
+// Громкость
+if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+        document.getElementById("bgm").volume = e.target.value;
+    });
+}
+
+musicOverlay.addEventListener('click', function() {
+    this.style.opacity = '0';
+    this.style.pointerEvents = 'none';
+    document.body.classList.add("music-started");
+    
+    if (playerContainer) playerContainer.classList.remove("player-hidden");
+    
+    loadTrack(0);
+    const audioEl = document.getElementById("bgm");
+    audioEl.volume = 0.5;
+    audioEl.play().then(() => {
+        if (cdDisk) cdDisk.classList.add("rotating");
+        if (playPauseBtn) playPauseBtn.textContent = "⏸";
+    });
+});
 
 </script>
 </body>
