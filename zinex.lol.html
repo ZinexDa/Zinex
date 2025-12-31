@@ -967,12 +967,25 @@ input[type=range] {
         transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--rEnd));
     }
 }
+
+/* ---------------------- САЛЮТ (FIREWORKS) ---------------------- */
+#fireworksCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Чтобы можно было кликать сквозь салют */
+    z-index: 2; /* Поверх фона, но под текстом */
+}
 </style>
 </head>
 
 <body>
 
 <canvas id="canvasVisualizer"></canvas>
+<canvas id="fireworksCanvas"></canvas>
+
 
 <div class="nav-tabs">
   <button class="action-btn" onclick="location.href='zinex.lol.html'">Главная</button>
@@ -1075,13 +1088,11 @@ input[type=range] {
 </div>
 
 <script>
-
 /* ----------------------------------------------------------
-   SETUP
+   GLOBAL VARIABLES & SETUP
 ----------------------------------------------------------- */
 const musicOverlay = document.getElementById("musicOverlay");
 const bgm = document.getElementById("bgm");
-const muteButton = document.getElementById("muteButton");
 const usagi = document.getElementById("usagi");
 const progressSlider = document.getElementById("progressSlider");
 const currentTimeEl = document.getElementById("currentTime");
@@ -1092,12 +1103,24 @@ const chirps = [
     new Audio("chirper2.ogg"), 
     new Audio("chirper3.ogg")
 ];
+chirps.forEach(c => { c.preload = "auto"; c.volume = 0.7; });
 
-chirps.forEach(c => { 
-    c.preload = "auto"; 
-    c.volume = 0.7;
-});
+// Player variables
+const songs = [
+    { name: "iiSU", src: "zinex.lol_files/iiSU.mp3" },
+    { name: "game", src: "zinex.lol_files/game.mp3" },
+    { name: "Норм", src: "zinex.lol_files/Норм.mp3" }
+];
+let currentSongIndex = 0;
+const playerContainer = document.getElementById("player-container");
+const cdDisk = document.getElementById("cd-disk");
+const trackNameDisplay = document.getElementById("current-track-name");
+const playPauseBtn = document.getElementById("playPauseBtn");
+const volumeSlider = document.getElementById("volumeSlider");
 
+/* ----------------------------------------------------------
+   HELPER FUNCTIONS
+----------------------------------------------------------- */
 function formatTime(seconds) {
     if (isNaN(seconds)) return "0:00";
     const m = Math.floor(seconds / 60);
@@ -1105,13 +1128,76 @@ function formatTime(seconds) {
     return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+function random(min, max) { return Math.random() * (max - min) + min; }
+
 /* ----------------------------------------------------------
-   START
+   PLAYER LOGIC
 ----------------------------------------------------------- */
+function loadTrack(index) {
+    if (index < 0 || index >= songs.length) index = 0;
+    const song = songs[index];
+    bgm.src = song.src;
+    trackNameDisplay.textContent = song.name;
+    progressSlider.value = 0;
+    currentTimeEl.textContent = "0:00";
+    totalTimeEl.textContent = "..."; 
+}
+
+function togglePlay() {
+    if (bgm.paused) {
+        bgm.play();
+        playPauseBtn.textContent = "⏸";
+        cdDisk.classList.add("rotating");
+    } else {
+        bgm.pause();
+        playPauseBtn.textContent = "▶";
+        cdDisk.classList.remove("rotating");
+    }
+}
+
+function nextTrack() {
+    currentSongIndex = (currentSongIndex + 1) % songs.length;
+    loadTrack(currentSongIndex);
+    bgm.play();
+    playPauseBtn.textContent = "⏸";
+    cdDisk.classList.add("rotating");
+}
+
+function prevTrack() {
+    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
+    loadTrack(currentSongIndex);
+    bgm.play();
+    playPauseBtn.textContent = "⏸";
+    cdDisk.classList.add("rotating");
+}
+
+bgm.addEventListener('timeupdate', () => {
+    if (document.activeElement !== progressSlider) {
+        progressSlider.value = bgm.currentTime;
+    }
+    currentTimeEl.textContent = formatTime(bgm.currentTime);
+});
+
+bgm.addEventListener('loadedmetadata', () => {
+    progressSlider.max = bgm.duration;
+    totalTimeEl.textContent = formatTime(bgm.duration);
+});
+
+progressSlider.addEventListener('input', () => {
+    currentTimeEl.textContent = formatTime(progressSlider.value);
+    bgm.currentTime = progressSlider.value;
+});
+
+if (volumeSlider) {
+    volumeSlider.addEventListener('input', (e) => {
+        bgm.volume = e.target.value;
+    });
+}
+
+// Start Experience
 musicOverlay.addEventListener('click', function() {
     this.style.opacity = '0';
     this.style.pointerEvents = 'none';
-
     document.body.classList.add("music-started");
     
     if (playerContainer) {
@@ -1119,20 +1205,17 @@ musicOverlay.addEventListener('click', function() {
     }
 
     loadTrack(currentSongIndex); 
-    
-    if (bgm) {
-        bgm.volume = 0.5;
-        bgm.play().then(() => {
-            if (cdDisk) cdDisk.classList.add("rotating");
-            if (playPauseBtn) playPauseBtn.textContent = "⏸";
-        }).catch(error => {
-            console.log("Ошибка воспроизведения:", error);
-        });
-    }
+    bgm.volume = 0.5;
+    bgm.play().then(() => {
+        if (cdDisk) cdDisk.classList.add("rotating");
+        if (playPauseBtn) playPauseBtn.textContent = "⏸";
+    }).catch(error => {
+        console.log("Ошибка воспроизведения:", error);
+    });
 });
 
 /* ----------------------------------------------------------
-   USAGI
+   USAGI & INTERACTION
 ----------------------------------------------------------- */
 const logo = document.querySelector(".interactive-logo");
 if (usagi && logo) {
@@ -1153,118 +1236,6 @@ if (usagi && logo) {
     });
 }
 
-/* ----------------------------------------------------------
-   ГЕНЕРАТОР ПАРТИКЛОВ НОТ
------------------------------------------------------------ */
-function spawnNote() {
-    const audioEl = document.getElementById("bgm");
-    if (!audioEl || audioEl.paused || document.getElementById("player-container").classList.contains("player-hidden")) return;
-    
-    const container = document.getElementById("notes-container");
-    if (!container) return;
-
-    const note = document.createElement("div");
-    note.className = "note-particle";
-    
-    const icons = ["♪", "♫", "♬", "♩", "𝄢"];
-    note.textContent = icons[Math.floor(Math.random() * icons.length)];
-
-    const angleDeg = -30 - Math.random() * 120; 
-    const angleRad = angleDeg * (Math.PI / 180);
-
-    const distance = 60 + Math.random() * 60;
-
-    const tx = Math.cos(angleRad) * distance;
-    const ty = Math.sin(angleRad) * distance;
-
-    const rStart = (Math.random() * 40 - 20) + "deg";
-    const rEnd = (Math.random() * 180 - 90) + "deg";
-
-    const duration = 1.5 + Math.random() * 1 + "s";
-
-    note.style.setProperty('--tx', `${tx}px`);
-    note.style.setProperty('--ty', `${ty}px`);
-    note.style.setProperty('--rStart', rStart);
-    note.style.setProperty('--rEnd', rEnd);
-    note.style.setProperty('--duration', duration);
-
-    container.appendChild(note);
-    
-    setTimeout(() => {
-        note.remove();
-    }, parseFloat(duration) * 1000);
-}
-
-setInterval(spawnNote, 400);
-
-function burstNotes() {
-    for(let i=0; i<8; i++) {
-        setTimeout(spawnNote, i * 50);
-    }
-}
-
-/* ----------------------------------------------------------
-   COUNTDOWN
------------------------------------------------------------ */
-function updateNewYearCountdown() {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const newYear = new Date(currentYear + 1, 0, 1);
-    const timeLeft = newYear - now;
-    
-    const cdEl = document.getElementById("countdown");
-    if (!cdEl) return;
-
-    if (timeLeft <= 0) {
-        cdEl.textContent = "🎉 HAPPY NEW YEAR! 🎉";
-        return;
-    }
-    
-    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-    
-    cdEl.textContent = `${days}д ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
-}
-setInterval(updateNewYearCountdown, 1000);
-updateNewYearCountdown();
-
-/* ----------------------------------------------------------
-   ОБНОВЛЕНИЕ ПЛЕЕРА
------------------------------------------------------------ */
-bgm.addEventListener('timeupdate', () => {
-    if (document.activeElement !== progressSlider) {
-        progressSlider.value = bgm.currentTime;
-    }
-    currentTimeEl.textContent = formatTime(bgm.currentTime);
-});
-
-bgm.addEventListener('loadedmetadata', () => {
-    progressSlider.max = bgm.duration;
-    totalTimeEl.textContent = formatTime(bgm.duration);
-});
-
-progressSlider.addEventListener('input', () => {
-    currentTimeEl.textContent = formatTime(progressSlider.value);
-    bgm.currentTime = progressSlider.value;
-});
-
-function loadTrack(index) {
-    if (index < 0 || index >= songs.length) index = 0;
-    const song = songs[index];
-    bgm.src = song.src;
-    bgm.load(); 
-    trackNameDisplay.textContent = song.name;
-    
-    progressSlider.value = 0;
-    currentTimeEl.textContent = "0:00";
-    totalTimeEl.textContent = "..."; 
-}
-
-/* ----------------------------------------------------------
-   FALLING PEAM
------------------------------------------------------------ */
 function spawnFallingPeam() {
     const img = document.createElement("img");
     img.src = "zinex.lol_files/peam.png";
@@ -1298,79 +1269,95 @@ if (cdWrapper) {
 }
 
 /* ----------------------------------------------------------
-   FALLING BACKGROUND FIGURES (BLOSSOMS)
+   PARTICLES & VISUALS
 ----------------------------------------------------------- */
+// Notes Particle Generator
+function spawnNote() {
+    if (bgm.paused || playerContainer.classList.contains("player-hidden")) return;
+    
+    const container = document.getElementById("notes-container");
+    if (!container) return;
+
+    const note = document.createElement("div");
+    note.className = "note-particle";
+    
+    const icons = ["♪", "♫", "♬", "♩", "𝄢"];
+    note.textContent = icons[Math.floor(Math.random() * icons.length)];
+
+    const angleDeg = -30 - Math.random() * 120; 
+    const angleRad = angleDeg * (Math.PI / 180);
+    const distance = 60 + Math.random() * 60;
+
+    const tx = Math.cos(angleRad) * distance;
+    const ty = Math.sin(angleRad) * distance;
+    const rStart = (Math.random() * 40 - 20) + "deg";
+    const rEnd = (Math.random() * 180 - 90) + "deg";
+    const duration = 1.5 + Math.random() * 1 + "s";
+
+    note.style.setProperty('--tx', `${tx}px`);
+    note.style.setProperty('--ty', `${ty}px`);
+    note.style.setProperty('--rStart', rStart);
+    note.style.setProperty('--rEnd', rEnd);
+    note.style.setProperty('--duration', duration);
+
+    container.appendChild(note);
+    
+    setTimeout(() => { note.remove(); }, parseFloat(duration) * 1000);
+}
+setInterval(spawnNote, 400);
+
+// Blossoms Background
 function spawnBlossom() {
     const blossom = document.createElement("div");
     blossom.className = "blossom";
-    
     const emojis = ["⛄","🎄","🌨️","☃️","❄️","🎁","✨","🌟"];
     blossom.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-    
     blossom.style.left = (Math.random() * window.innerWidth) + "px";
     blossom.style.top = "-50px";
     const duration = 4 + Math.random() * 5; 
     blossom.style.animation = `blossomFall ${duration}s linear forwards`;
-    
     document.body.appendChild(blossom);
-    
-    setTimeout(() => {
-        blossom.remove();
-    }, duration * 1000);
+    setTimeout(() => { blossom.remove(); }, duration * 1000);
 }
-
 setInterval(() => {
     if (document.body.classList.contains('music-started')) {
         spawnBlossom();
     }
 }, 1000);
 
-
-/* ----------------------------------------------------------
-   3D TILT
------------------------------------------------------------ */
+// 3D Tilt
 function init3DTilt() {
     const panel = document.querySelector('.info-panel');
     const container = document.querySelector('.tilt-container');
-    
     if (!panel || !container) return;
     
     container.addEventListener('mousemove', (e) => {
         const rect = container.getBoundingClientRect();
         const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
         const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
-        
-        const rotateY = mouseX * 15; 
-        const rotateX = -mouseY * 15;
-        
-        panel.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) translateZ(10px)`;
+        panel.style.transform = `rotateY(${mouseX * 15}deg) rotateX(${-mouseY * 15}deg) translateZ(10px)`;
     });
-    
     container.addEventListener('mouseleave', () => {
         panel.style.transform = 'rotateY(0deg) rotateX(0deg) translateZ(0px)';
     });
 }
 document.addEventListener('DOMContentLoaded', init3DTilt);
 
-/* ----------------------------------------------------------
-   VISUALIZER
------------------------------------------------------------ */
+// Visualizer
 const canvas = document.getElementById('canvasVisualizer');
 const ctx = canvas.getContext('2d');
+let rotation = 0;
+const barCount = 64;
 
 function resizeCanvas() {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 }
-resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-let rotation = 0;
-const barCount = 64;
-
-function animate() {
+function animateVisualizer() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-
   const logoEl = document.querySelector('.interactive-logo');
   
   if (logoEl) {
@@ -1386,123 +1373,214 @@ function animate() {
         const x = centerX + Math.cos(angle) * radius;
         const y = centerY + Math.sin(angle) * radius;
         
+        // Mock frequency data based on time
         const height = 20 + Math.sin(Date.now()/300 + i * 0.5) * 50;
         
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(angle);
-        
         ctx.shadowBlur = 30;
         ctx.shadowColor = '#4a90e2';
-        
         ctx.fillStyle = '#73b7ff';
         ctx.fillRect(-3, 0, 6, height);
-        
         ctx.fillStyle = '#ffffff';
         ctx.globalAlpha = 0.6;
         ctx.fillRect(-1, 0, 2, height * 0.8);
-        
         ctx.restore();
       }
   }
-
-  requestAnimationFrame(animate);
+  requestAnimationFrame(animateVisualizer);
 }
-document.addEventListener('DOMContentLoaded', animate);
+document.addEventListener('DOMContentLoaded', animateVisualizer);
 
 /* ----------------------------------------------------------
-   плеер
+   FIREWORKS ENGINE
 ----------------------------------------------------------- */
-const songs = [
-    { name: "iiSU", src: "zinex.lol_files/iiSU.mp3" },
-    { name: "game", src: "zinex.lol_files/game.mp3" },
-    { name: "Норм", src: "zinex.lol_files/Норм.mp3" }
-];
+const fwCanvas = document.getElementById('fireworksCanvas');
+const fwCtx = fwCanvas.getContext('2d');
+let fwWidth = window.innerWidth;
+let fwHeight = window.innerHeight;
+let fireworks = [];
+let particles = [];
+let fireworksActive = false;
 
-let currentSongIndex = 0;
+window.addEventListener('resize', () => {
+    fwWidth = window.innerWidth;
+    fwHeight = window.innerHeight;
+    fwCanvas.width = fwWidth;
+    fwCanvas.height = fwHeight;
+});
+fwCanvas.width = fwWidth;
+fwCanvas.height = fwHeight;
 
-const playerContainer = document.getElementById("player-container");
-const cdDisk = document.getElementById("cd-disk");
-const trackNameDisplay = document.getElementById("current-track-name");
-const playPauseBtn = document.getElementById("playPauseBtn");
-const volumeSlider = document.getElementById("volumeSlider");
+class Firework {
+    constructor(tx, ty) {
+        this.x = fwWidth / 2 + random(-200, 200); 
+        this.y = fwHeight;
+        this.tx = tx; 
+        this.ty = ty; 
+        this.distanceToTarget = Math.sqrt(Math.pow(tx - this.x, 2) + Math.pow(ty - this.y, 2));
+        this.distanceTraveled = 0;
+        this.coordinates = [];
+        this.coordinateCount = 3;
+        while(this.coordinateCount--) {
+            this.coordinates.push([this.x, this.y]);
+        }
+        this.angle = Math.atan2(ty - this.y, tx - this.x);
+        this.speed = 2;
+        this.acceleration = 1.05;
+        this.brightness = random(50, 70);
+        this.hue = random(0, 360); 
+    }
 
-function loadTrack(index) {
-    const song = songs[index];
-    const audioEl = document.getElementById("bgm"); 
-    audioEl.src = song.src;
-    trackNameDisplay.textContent = song.name;
-}
+    update(index) {
+        this.coordinates.pop();
+        this.coordinates.unshift([this.x, this.y]);
+        this.speed *= this.acceleration;
+        const vx = Math.cos(this.angle) * this.speed;
+        const vy = Math.sin(this.angle) * this.speed;
+        this.distanceTraveled = Math.sqrt(Math.pow(this.x - this.tx + vx, 2) + Math.pow(this.y - this.ty + vy, 2)); 
+        
+        if (this.distanceTraveled < this.distanceToTarget && this.y > this.ty) {
+             this.x += vx;
+             this.y += vy;
+        } else {
+             createParticles(this.tx, this.ty, this.hue);
+             fireworks.splice(index, 1);
+        }
+    }
 
-function togglePlay() {
-    const audioEl = document.getElementById("bgm");
-    if (audioEl.paused) {
-        audioEl.play();
-        playPauseBtn.textContent = "⏸";
-        cdDisk.classList.add("rotating");
-    } else {
-        audioEl.pause();
-        playPauseBtn.textContent = "▶";
-        cdDisk.classList.remove("rotating");
+    draw() {
+        fwCtx.beginPath();
+        fwCtx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+        fwCtx.lineTo(this.x, this.y);
+        fwCtx.strokeStyle = 'hsl(' + this.hue + ', 100%, ' + this.brightness + '%)';
+        fwCtx.stroke();
     }
 }
 
-function nextTrack() {
-    currentSongIndex = (currentSongIndex + 1) % songs.length;
-    loadTrack(currentSongIndex);
-    document.getElementById("bgm").play();
-    playPauseBtn.textContent = "⏸";
-    cdDisk.classList.add("rotating");
+class Particle {
+    constructor(x, y, hue) {
+        this.x = x;
+        this.y = y;
+        this.coordinates = [];
+        this.coordinateCount = 5;
+        while(this.coordinateCount--) {
+            this.coordinates.push([this.x, this.y]);
+        }
+        this.angle = random(0, Math.PI * 2);
+        this.speed = random(1, 10);
+        this.friction = 0.95;
+        this.gravity = 1;
+        this.hue = random(hue - 20, hue + 20);
+        this.brightness = random(50, 80);
+        this.alpha = 1;
+        this.decay = random(0.015, 0.03);
+    }
+
+    update(index) {
+        this.coordinates.pop();
+        this.coordinates.unshift([this.x, this.y]);
+        this.speed *= this.friction;
+        this.x += Math.cos(this.angle) * this.speed;
+        this.y += Math.sin(this.angle) * this.speed + this.gravity;
+        this.alpha -= this.decay;
+
+        if (this.alpha <= this.decay) {
+            particles.splice(index, 1);
+        }
+    }
+
+    draw() {
+        fwCtx.beginPath();
+        fwCtx.moveTo(this.coordinates[this.coordinates.length - 1][0], this.coordinates[this.coordinates.length - 1][1]);
+        fwCtx.lineTo(this.x, this.y);
+        fwCtx.strokeStyle = 'hsla(' + this.hue + ', 100%, ' + this.brightness + '%, ' + this.alpha + ')';
+        fwCtx.stroke();
+    }
 }
 
-function prevTrack() {
-    currentSongIndex = (currentSongIndex - 1 + songs.length) % songs.length;
-    loadTrack(currentSongIndex);
-    document.getElementById("bgm").play();
-    playPauseBtn.textContent = "⏸";
-    cdDisk.classList.add("rotating");
+function createParticles(x, y, hue) {
+    let particleCount = 30;
+    while(particleCount--) {
+        particles.push(new Particle(x, y, hue));
+    }
 }
 
-function spawnNote() {
-    const audioEl = document.getElementById("bgm");
-    if (!audioEl || audioEl.paused) return;
+function loopFireworks() {
+    if (!fireworksActive) return;
+
+    requestAnimationFrame(loopFireworks);
     
-    const container = document.getElementById("notes-container");
-    if (!container) return;
+    fwCtx.globalCompositeOperation = 'destination-out';
+    fwCtx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    fwCtx.fillRect(0, 0, fwWidth, fwHeight);
+    fwCtx.globalCompositeOperation = 'lighter';
 
-    const note = document.createElement("div");
-    note.className = "note";
-    const icons = ["♪", "♫", "♬", "♩"];
-    note.textContent = icons[Math.floor(Math.random() * icons.length)];
-    note.style.left = Math.random() * 30 + "px";
-    container.appendChild(note);
-    setTimeout(() => note.remove(), 2000);
+    let i = fireworks.length;
+    while(i--) {
+        fireworks[i].draw();
+        fireworks[i].update(i);
+    }
+
+    let j = particles.length;
+    while(j--) {
+        particles[j].draw();
+        particles[j].update(j);
+    }
+
+    if (Math.random() < 0.05) { 
+        fireworks.push(new Firework(random(0, fwWidth), random(0, fwHeight / 2)));
+    }
 }
-setInterval(spawnNote, 600);
 
-// Громкость
-if (volumeSlider) {
-    volumeSlider.addEventListener('input', (e) => {
-        document.getElementById("bgm").volume = e.target.value;
-    });
+function startFireworks() {
+    if (!fireworksActive) {
+        fireworksActive = true;
+        loopFireworks();
+    }
 }
 
-musicOverlay.addEventListener('click', function() {
-    this.style.opacity = '0';
-    this.style.pointerEvents = 'none';
-    document.body.classList.add("music-started");
+/* ----------------------------------------------------------
+   COUNTDOWN & LOGIC
+----------------------------------------------------------- */
+function updateNewYearCountdown() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
     
-    if (playerContainer) playerContainer.classList.remove("player-hidden");
-    
-    loadTrack(0);
-    const audioEl = document.getElementById("bgm");
-    audioEl.volume = 0.5;
-    audioEl.play().then(() => {
-        if (cdDisk) cdDisk.classList.add("rotating");
-        if (playPauseBtn) playPauseBtn.textContent = "⏸";
-    });
-});
+    // Check if today is Jan 1st
+    const isJan1 = (now.getMonth() === 0 && now.getDate() === 1);
 
+    const cdEl = document.getElementById("countdown");
+    if (!cdEl) return;
+
+    if (isJan1) {
+        cdEl.textContent = "🎉 HAPPY NEW YEAR! 🎉";
+        cdEl.style.textShadow = "0 0 20px #ff00cc, 0 0 40px #00ffff"; 
+        startFireworks();
+        return;
+    }
+
+    const newYear = new Date(currentYear + 1, 0, 1);
+    const timeLeft = newYear - now;
+
+    if (timeLeft <= 0) {
+        cdEl.textContent = "🎉 HAPPY NEW YEAR! 🎉";
+        cdEl.style.textShadow = "0 0 20px #ff00cc, 0 0 40px #00ffff"; 
+        startFireworks();
+        return;
+    }
+    
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+    
+    cdEl.textContent = `${days}д ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+}
+
+setInterval(updateNewYearCountdown, 1000);
+updateNewYearCountdown();
 </script>
 </body>
 </html>
