@@ -836,7 +836,7 @@ body.music-started .main-content {
     position: absolute;
 }
 
-/* Vinyl disk — compact */
+/* Vinyl disk compact */
 .di-vinyl {
     width: 32px;
     height: 32px;
@@ -860,7 +860,7 @@ body.music-started .main-content {
 .di-vinyl.rotating { animation: diSpin 3s linear infinite; }
 @keyframes diSpin { to { transform: rotate(360deg); } }
 
-/* Track name — compact */
+/* Track name compact */
 .di-track-compact {
     flex: 1;
     font-size: 12px;
@@ -872,7 +872,7 @@ body.music-started .main-content {
     text-align: center;
 }
 
-/* Equalizer bars — compact */
+/* Equalizer bars compact */
 .di-eq {
     display: flex;
     align-items: flex-end;
@@ -1095,16 +1095,24 @@ body.music-started .main-content {
 #di-wrapper.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(-80px); transition: opacity 0.4s, transform 0.4s; }
 #di-wrapper.visible { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); transition: opacity 0.5s ease 0.2s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s; }
 
+/* Notes container full-pill overlay, pointer-events none */
+#di-notes-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+    z-index: 100000;
+}
+
 /* ---------------------- ПАРТИКЛЫ НОТ ---------------------- */
 .note-particle {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    /* top/left set dynamically via JS to vinyl center */
     color: #73b7ff;
-    font-size: 20px;
+    font-size: 18px;
     font-family: "Segoe UI Emoji", sans-serif;
     pointer-events: none;
-    z-index: 99998;
+    z-index: 100001;
     opacity: 0;
     
     text-shadow: 0 0 10px rgba(115, 183, 255, 0.8), 0 0 20px rgba(115, 183, 255, 0.4);
@@ -1114,16 +1122,16 @@ body.music-started .main-content {
 
 @keyframes floatNote {
     0% {
-        transform: translate(-50%, -50%) scale(0.2) rotate(0deg);
+        transform: translate(-50%, -50%) scale(0.3) rotate(0deg);
         opacity: 0;
     }
-    10% {
+    12% {
         opacity: 1;
-        transform: translate(-50%, -50%) scale(1.2) rotate(var(--rStart));
+        transform: translate(-50%, -50%) scale(1.1) rotate(var(--rStart));
     }
     100% {
         opacity: 0;
-        transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(var(--rEnd));
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.4) rotate(var(--rEnd));
     }
 }
 
@@ -1214,11 +1222,14 @@ body.music-started .main-content {
     </div>
 </div>
 
-<audio id="bgm" loop></audio>
+<audio id="bgm"></audio>
 
 <!-- ===== DYNAMIC ISLAND PLAYER ===== -->
 <div id="di-wrapper" class="hidden">
     <div id="di-pill">
+
+        <!-- NOTE PARTICLES OVERLAY always inside the pill, positioned over active vinyl -->
+        <div id="di-notes-container"></div>
 
         <!-- COMPACT STATE -->
         <div id="di-compact">
@@ -1331,7 +1342,7 @@ function updateSliderFill(slider) {
 }
 
 /* ----------------------------------------------------------
-   PLAYER LOGIC — FIXED
+   PLAYER LOGIC
 ----------------------------------------------------------- */
 function loadTrack(index, autoplay) {
     if (index < 0 || index >= songs.length) index = 0;
@@ -1411,7 +1422,7 @@ bgm.addEventListener('ended', () => {
     nextTrack();
 });
 
-/* Progress slider — seeking fix */
+/* Progress slider seeking fix */
 diProgress.addEventListener('mousedown', () => { isUserSeeking = true; });
 diProgress.addEventListener('touchstart', () => { isUserSeeking = true; }, { passive: true });
 
@@ -1550,41 +1561,57 @@ if (cdWrapper) {
 }
 
 /* ----------------------------------------------------------
-   PARTICLES & VISUALS
+   NOTE PARTICLES anchored to active vinyl disc
 ----------------------------------------------------------- */
-// Notes Particle Generator — attached to Dynamic Island vinyl
 function spawnNote() {
     if (bgm.paused) return;
-    
-    const container = diWrapper;
-    if (!container) return;
+
+    const notesContainer = document.getElementById("di-notes-container");
+    if (!notesContainer) return;
+
+    // Pick which vinyl is currently visible
+    const activeVinyl = pillExpanded
+        ? document.getElementById("di-vinyl-big")
+        : document.getElementById("di-vinyl-compact");
+    if (!activeVinyl) return;
+
+    // Get positions relative to the pill (notes container parent)
+    const pillRect  = diPill.getBoundingClientRect();
+    const vinylRect = activeVinyl.getBoundingClientRect();
+
+    // Center of the vinyl in pill-local coords
+    const originX = (vinylRect.left - pillRect.left) + vinylRect.width  / 2;
+    const originY = (vinylRect.top  - pillRect.top)  + vinylRect.height / 2;
 
     const note = document.createElement("div");
     note.className = "note-particle";
-    
+
     const icons = ["♪", "♫", "♬", "♩", "𝄢"];
     note.textContent = icons[Math.floor(Math.random() * icons.length)];
 
-    const angleDeg = -30 - Math.random() * 120; 
+    // Fly upward and outward from the disc
+    const angleDeg = -20 - Math.random() * 140;
     const angleRad = angleDeg * (Math.PI / 180);
-    const distance = 60 + Math.random() * 60;
+    const distance = 40 + Math.random() * 50;
 
     const tx = Math.cos(angleRad) * distance;
     const ty = Math.sin(angleRad) * distance;
-    const rStart = (Math.random() * 40 - 20) + "deg";
-    const rEnd = (Math.random() * 180 - 90) + "deg";
-    const duration = 1.5 + Math.random() * 1 + "s";
+    const rStart   = (Math.random() * 40  - 20)  + "deg";
+    const rEnd     = (Math.random() * 180 - 90)  + "deg";
+    const duration = (1.2 + Math.random() * 0.8) + "s";
 
-    note.style.setProperty('--tx', `${tx}px`);
-    note.style.setProperty('--ty', `${ty}px`);
-    note.style.setProperty('--rStart', rStart);
-    note.style.setProperty('--rEnd', rEnd);
+    note.style.left = originX + "px";
+    note.style.top  = originY + "px";
+    note.style.setProperty('--tx',       `${tx}px`);
+    note.style.setProperty('--ty',       `${ty}px`);
+    note.style.setProperty('--rStart',   rStart);
+    note.style.setProperty('--rEnd',     rEnd);
     note.style.setProperty('--duration', duration);
 
-    container.appendChild(note);
-    setTimeout(() => { note.remove(); }, parseFloat(duration) * 1000);
+    notesContainer.appendChild(note);
+    setTimeout(() => { note.remove(); }, parseFloat(duration) * 1000 + 100);
 }
-setInterval(spawnNote, 400);
+setInterval(spawnNote, 380);
 
 // Blossoms Background
 function spawnBlossom() {
