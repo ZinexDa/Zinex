@@ -793,9 +793,9 @@ body.music-started .main-content {
     user-select: none;
 
     /* Compact pill dimensions */
-    width: 220px;
+    width: 240px;
     height: 48px;
-    padding: 0 14px;
+    padding: 0 12px 0 12px;
     gap: 10px;
 
     /* Smooth morph */
@@ -826,7 +826,7 @@ body.music-started .main-content {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    gap: 10px;
+    gap: 0;
     opacity: 1;
     transition: opacity 0.2s ease;
 }
@@ -836,7 +836,7 @@ body.music-started .main-content {
     position: absolute;
 }
 
-/* Vinyl disk compact */
+/* Vinyl disk — compact */
 .di-vinyl {
     width: 32px;
     height: 32px;
@@ -860,25 +860,38 @@ body.music-started .main-content {
 .di-vinyl.rotating { animation: diSpin 3s linear infinite; }
 @keyframes diSpin { to { transform: rotate(360deg); } }
 
-/* Track name compact */
-.di-track-compact {
+/* Left group: vinyl + title — takes all available space, clips overflow */
+.di-compact-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Track title — constrained so it never pushes EQ out */
+.di-track-compact {
     font-size: 12px;
     font-family: 'ContinuumMedium', sans-serif;
     color: #fff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    text-align: center;
+    text-align: left;
+    min-width: 0;
+    flex: 1;
 }
 
-/* Equalizer bars compact */
+/* Equalizer bars — pinned to far right with margin-left: auto */
 .di-eq {
     display: flex;
     align-items: flex-end;
     gap: 2px;
     height: 20px;
     flex-shrink: 0;
+    margin-left: auto;
+    padding-left: 10px;
 }
 .di-eq span {
     display: block;
@@ -1095,7 +1108,7 @@ body.music-started .main-content {
 #di-wrapper.hidden { opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(-80px); transition: opacity 0.4s, transform 0.4s; }
 #di-wrapper.visible { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); transition: opacity 0.5s ease 0.2s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.2s; }
 
-/* Notes container full-pill overlay, pointer-events none */
+/* Notes container — full-pill overlay, pointer-events none */
 #di-notes-container {
     position: absolute;
     inset: 0;
@@ -1228,13 +1241,15 @@ body.music-started .main-content {
 <div id="di-wrapper" class="hidden">
     <div id="di-pill">
 
-        <!-- NOTE PARTICLES OVERLAY always inside the pill, positioned over active vinyl -->
+        <!-- NOTE PARTICLES OVERLAY — always inside the pill, positioned over active vinyl -->
         <div id="di-notes-container"></div>
 
         <!-- COMPACT STATE -->
         <div id="di-compact">
-            <div class="di-vinyl" id="di-vinyl-compact"></div>
-            <div class="di-track-compact" id="di-track-compact">Loading...</div>
+            <div class="di-compact-left">
+                <div class="di-vinyl" id="di-vinyl-compact"></div>
+                <div class="di-track-compact" id="di-track-compact">Loading...</div>
+            </div>
             <div class="di-eq" id="di-eq">
                 <span></span><span></span><span></span><span></span>
             </div>
@@ -1342,7 +1357,7 @@ function updateSliderFill(slider) {
 }
 
 /* ----------------------------------------------------------
-   PLAYER LOGIC
+   PLAYER LOGIC — FIXED
 ----------------------------------------------------------- */
 function loadTrack(index, autoplay) {
     if (index < 0 || index >= songs.length) index = 0;
@@ -1422,7 +1437,7 @@ bgm.addEventListener('ended', () => {
     nextTrack();
 });
 
-/* Progress slider seeking fix */
+/* Progress slider — seeking fix */
 diProgress.addEventListener('mousedown', () => { isUserSeeking = true; });
 diProgress.addEventListener('touchstart', () => { isUserSeeking = true; }, { passive: true });
 
@@ -1561,7 +1576,7 @@ if (cdWrapper) {
 }
 
 /* ----------------------------------------------------------
-   NOTE PARTICLES anchored to active vinyl disc
+   NOTE PARTICLES — anchored to active vinyl disc
 ----------------------------------------------------------- */
 function spawnNote() {
     if (bgm.paused) return;
