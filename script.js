@@ -764,12 +764,6 @@ document.addEventListener('DOMContentLoaded', animateVisualizer);
    ██║  ██║██╔══╝  ██╔══██╗██║   ██║██║   ██║
    ██████╔╝███████╗██████╔╝╚██████╔╝╚██████╔╝
    ╚═════╝ ╚══════╝╚═════╝  ╚═════╝  ╚═════╝
-
-   SECRET DEBUG MENU
-   First unlock: type  k u i t m e i q k m o  on keyboard.
-   After that, a [debug] button appears in the bottom-left
-   corner and persists via localStorage until manually hidden.
-   The button can be hidden again from inside the debug menu.
 ========================================================== */
 const DEBUG_CODE       = "kuitmeiqkmo";
 const DEBUG_UNLOCK_KEY = "zinex_debug_unlocked";  // localStorage key
