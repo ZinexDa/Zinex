@@ -53,7 +53,10 @@
                 </div>
                 <div class="info-item">
                     <span class="label">My projects:</span>
-                    <span class="value">Zeonix Launcher(временно закрыт на редизайн), Sonic Junction Forum, Pixel Lab, LumixEngine</span>
+                    <span class="value projects-value">
+                        Zeonix Launcher, Sonic Junction, Pixel Lab, LumixEngine
+                        <button class="projects-btn" onclick="openProjectsModal()">Посмотреть проекты</button>
+                    </span>
                 </div>
                 <div class="info-item">
                     <span class="label">Languages:</span>
@@ -144,6 +147,161 @@
     </div>
 </div>
 
+<!-- ===== PROJECTS MODAL ===== -->
+<div id="projects-modal-overlay" onclick="closeProjectsModalOnOverlay(event)">
+    <div id="projects-modal">
+        <button class="modal-close-btn" onclick="closeProjectsModal()">✕</button>
+        <div class="modal-inner">
+            <!-- Left: project list -->
+            <div class="modal-projects-list">
+                <h3>Проекты</h3>
+                <ul>
+                    <li class="modal-project-item active" onclick="selectProject(this, 'zeonix')">
+                        <span class="project-dot"></span>Zeonix Launcher
+                    </li>
+                    <li class="modal-project-item" onclick="selectProject(this, 'sonic')">
+                        <span class="project-dot"></span>Sonic Junction
+                    </li>
+                    <li class="modal-project-item" onclick="selectProject(this, 'pixel')">
+                        <span class="project-dot"></span>Pixel Lab
+                    </li>
+                    <li class="modal-project-item" onclick="selectProject(this, 'lumix')">
+                        <span class="project-dot"></span>LumixEngine
+                    </li>
+                </ul>
+            </div>
+            <!-- Right: project description -->
+            <div class="modal-project-desc">
+                <div id="modal-project-title" class="modal-desc-title">Zeonix Launcher</div>
+                <div id="modal-project-body" class="modal-desc-body">Описание в разработке</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="script.js"></script>
+<script>
+// ===== PROJECTS MODAL =====
+const projectData = {
+    zeonix: {
+        title: 'Zeonix Launcher',
+        category: 'Лаунчер с эмуляторами (веб-приложение)',
+        stack: 'React, TypeScript, HTML/CSS',
+        desc: 'Описание в разработке',
+        features: []
+    },
+    sonic: {
+        title: 'Sonic Junction',
+        category: 'Форумное веб-приложение',
+        stack: 'React, TypeScript, Supabase, HTML/CSS',
+        desc: 'Фан-платформа и тематический форум, посвященный франшизе Sonic the Hedgehog. Проект создан для объединения сообщества, публикации актуальных новостей серии и ведения дискуссий.',
+        features: [
+            'Управление темами, сообщениями и профилями пользователей.',
+            'Авторизация и надежная работа с базой данных на базе Supabase.',
+            'Адаптивный пользовательский интерфейс для комфортного чтения и навигации.'
+        ]
+    },
+    pixel: {
+        title: 'Pixel Lab',
+        category: 'Интерактивный веб-сервис (Pixel Battle)',
+        stack: 'JavaScript / TypeScript, WebSockets, HTML5 Canvas',
+        desc: 'Платформа для проведения пиксель-батлов в реальном времени. Можно объединятся в альянсы, закрашивать пиксели на общем холсте и соревноваться за территорию.',
+        features: [
+            'Синхронизация действий участников на единой карте в реальном времени.',
+            'Интеграция со стрим-трансляциями для привлечения активной аудитории.',
+            'Командная механика захвата и защиты участков холста.',
+            '3D-режим холста с возможностью вращения и масштабирования для улучшенного обзора.',
+        ]
+    },
+    lumix: {
+        title: 'LumixEngine2D',
+        category: '2D-игровой движок',
+        stack: 'Rust, wgpu, LuaJIT',
+        desc: 'Низкоуровневый и производительный 2D-движок, разработанный с акцентом на скорость работы, эффективное управление ресурсами и гибкую скриптовую логику.',
+        features: [
+            'Рендеринг с использованием графического API wgpu.',
+            'Интеграция LuaJIT для написания и быстрой отладки игровой логики.',
+            'Поддержка анимации спрайт-шитов, физических AABB-столкновений и Z-index сортировки слоев.',
+            'Динамическая загрузка текстурных ресурсов.',
+            'В будущем будет похож на UbiArt, SonicOrca'
+        ]
+    }
+};
+
+function renderProjectDesc(key) {
+    const p = projectData[key];
+    const titleEl = document.getElementById('modal-project-title');
+    const bodyEl  = document.getElementById('modal-project-body');
+
+    titleEl.textContent = p.title;
+
+    let html = '';
+
+    if (p.category) {
+        html += `<div class="modal-meta-row">
+            <span class="modal-meta-label">Категория</span>
+            <span class="modal-meta-value">${p.category}</span>
+        </div>`;
+    }
+
+    if (p.stack) {
+        const chips = p.stack.split(/,\s*/).map(t => `<span class="stack-chip">${t.trim()}</span>`).join('');
+        html += `<div class="modal-meta-row">
+            <span class="modal-meta-label">Стек</span>
+            <span class="modal-meta-value modal-stack">${chips}</span>
+        </div>`;
+    }
+
+    if (p.desc) {
+        html += `<p class="modal-desc-text">${p.desc}</p>`;
+    }
+
+    if (p.features && p.features.length > 0) {
+        html += `<div class="modal-features-title">Функционал</div><ul class="modal-features-list">`;
+        p.features.forEach(f => {
+            html += `<li>${f}</li>`;
+        });
+        html += `</ul>`;
+    }
+
+    bodyEl.innerHTML = html;
+}
+
+function openProjectsModal() {
+    document.getElementById('projects-modal-overlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    selectProjectById('zeonix');
+}
+
+function closeProjectsModal() {
+    document.getElementById('projects-modal-overlay').classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+function closeProjectsModalOnOverlay(e) {
+    if (e.target === document.getElementById('projects-modal-overlay')) {
+        closeProjectsModal();
+    }
+}
+
+function selectProject(el, key) {
+    document.querySelectorAll('.modal-project-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    renderProjectDesc(key);
+}
+
+function selectProjectById(key) {
+    const items = document.querySelectorAll('.modal-project-item');
+    const keys = ['zeonix', 'sonic', 'pixel', 'lumix'];
+    items.forEach((item, i) => {
+        item.classList.toggle('active', keys[i] === key);
+    });
+    renderProjectDesc(key);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeProjectsModal();
+});
+</script>
 </body>
 </html>
