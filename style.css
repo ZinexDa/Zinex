@@ -41,10 +41,11 @@ h1 {
 
 /* ---------------------- 3D LOGO WITH LIQUID GLASS ---------------------- */
 .interactive-logo {
-    width: 250px;
-    height: 250px; 
+    width: 150px;
+    height: 150px;
     max-width: 70%;
-    margin-bottom: 15px;
+    margin: 0 auto 15px auto;
+    display: block;
     cursor: pointer;
     border-radius: 50%;
     object-fit: cover;
