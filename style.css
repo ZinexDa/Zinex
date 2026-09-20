@@ -1237,14 +1237,14 @@ body.music-started .main-content {
 .languages-icons {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 11px;
     flex-wrap: wrap;
     justify-content: flex-end;
+    max-width: 320px;
 }
 
 .languages-icons i {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.82);
+    font-size: 21px;
     transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     cursor: pointer;
     display: inline-flex;
@@ -1253,9 +1253,20 @@ body.music-started .main-content {
 }
 
 .languages-icons i:hover {
-    color: #73b7ff;
     transform: translateY(-3px) scale(1.25);
-    filter: drop-shadow(0 0 8px rgba(115, 183, 255, 0.9));
+    filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Ensure darker devicons have optimal visibility against the dark glass background */
+.languages-icons .devicon-rust-original.colored,
+.languages-icons .devicon-rust-plain.colored {
+    color: #dea584 !important;
+}
+.languages-icons .devicon-lua-plain.colored {
+    color: #5164cf !important;
+}
+.languages-icons .devicon-cplusplus-plain.colored {
+    color: #00599c !important;
 }
 
 /* =====================================================
