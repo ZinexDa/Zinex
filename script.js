@@ -15,7 +15,7 @@ chirps.forEach(c => { c.preload = "auto"; c.volume = 0.7; });
 const songs = [
     { name: "iiSU",  src: "zinex.lol_files/iiSU.mp3"  },
     { name: "game",  src: "zinex.lol_files/game.mp3"  },
-    { name: "Норм",  src: "zinex.lol_files/Норм.mp3"  }
+    { name: "Norm",  src: "zinex.lol_files/Норм.mp3"  }
 ];
 let currentSongIndex = 0;
 let isUserSeeking    = false;
@@ -631,7 +631,7 @@ function updateCountdown() {
     const hrs  = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const mins = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
     const secs = Math.floor((ms % (1000 * 60)) / 1000);
-    cdEl.textContent = `${days}д ${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    cdEl.textContent = `${days}d ${hrs.toString().padStart(2,'0')}:${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
 }
 
 setInterval(updateCountdown, 1000);

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>zinex.lol</title>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,9 +15,9 @@
 
 
 <div class="nav-tabs">
-  <button class="action-btn" onclick="location.href='zinex.lol.html'">Главная</button>
+  <button class="action-btn" onclick="location.href='zinex.lol.html'">Home</button>
  <!-- <a href="https://zeonix-launcher-site.vercel.app" target="_blank">
-    <button class="action-btn">Zeonix Launcher(временно закрыт на редизайн)</button>
+    <button class="action-btn">Zeonix Launcher(temporarily closed for redesign)</button>
 </a>
 -->
   <a href="https://www.sonic-junction.ru/" target="_blank">
@@ -54,17 +55,29 @@
                 <div class="info-item">
                     <span class="label">My projects:</span>
                     <span class="value projects-value">
-                        Zeonix Launcher, Sonic Junction, Pixel Lab, LumixEngine
-                        <button class="projects-btn" onclick="openProjectsModal()">Посмотреть проекты</button>
+                        Zeonix Launcher, Sonic Junction, Pixel Lab, LumixEngine, Sonic R Android Port
+                        <button class="projects-btn" onclick="openProjectsModal()">View Projects</button>
                     </span>
                 </div>
                 <div class="info-item">
                     <span class="label">Languages:</span>
-                    <span class="value">Lua, GodotScript, JS, TS, React, Kotlin, Rust</span>
+                    <div class="languages-icons">
+                        <i class="devicon-lua-plain" title="Lua"></i>
+                        <i class="devicon-godot-plain" title="GDScript (Godot)"></i>
+                        <i class="devicon-javascript-plain" title="JavaScript"></i>
+                        <i class="devicon-typescript-plain" title="TypeScript"></i>
+                        <i class="devicon-react-original" title="React"></i>
+                        <i class="devicon-kotlin-plain" title="Kotlin"></i>
+                        <i class="devicon-rust-original" title="Rust"></i>
+                    </div>
                 </div>
                 <div class="info-item">
-                    <span class="label">Site:</span>
-                    <span class="value">zinexda.github.io/Zinex</span>
+                    <span class="label">Donate:</span>
+                    <span class="value">
+                        <a href="https://www.donationalerts.com/r/zinexda" target="_blank" rel="noopener noreferrer" class="donate-btn">
+                            Donate
+                        </a>
+                    </span>
                 </div>
             </div>
             <div class="social-buttons">
@@ -154,7 +167,7 @@
         <div class="modal-inner">
             <!-- Left: project list -->
             <div class="modal-projects-list">
-                <h3>Проекты</h3>
+                <h3>Projects</h3>
                 <ul>
                     <li class="modal-project-item active" onclick="selectProject(this, 'zeonix')">
                         <span class="project-dot"></span>Zeonix Launcher
@@ -168,12 +181,15 @@
                     <li class="modal-project-item fire-project" onclick="selectProject(this, 'lumix')">
                         <span class="project-dot"></span>LumixEngine
                     </li>
+                    <li class="modal-project-item fire-project" onclick="selectProject(this, 'sonic_r')">
+                        <span class="project-dot"></span>Sonic R Android Port
+                    </li>
                 </ul>
             </div>
             <!-- Right: project description -->
             <div class="modal-project-desc">
                 <div id="modal-project-title" class="modal-desc-title">Zeonix Launcher</div>
-                <div id="modal-project-body" class="modal-desc-body">Описание в разработке</div>
+                <div id="modal-project-body" class="modal-desc-body">Description under development</div>
             </div>
         </div>
     </div>
@@ -185,47 +201,63 @@
 const projectData = {
     zeonix: {
         title: 'Zeonix Launcher',
-        category: 'Лаунчер с эмуляторами (веб-приложение)',
+        category: 'Web Launcher & Emulators',
         stack: 'React, TypeScript, HTML/CSS',
-        desc: 'Описание в разработке',
+        desc: 'Web-based game launcher with integrated emulators (currently undergoing redesign).',
         features: []
     },
     sonic: {
         title: 'Sonic Junction',
-        category: 'Форумное веб-приложение',
+        category: 'Community Forum Web App',
         stack: 'React, TypeScript, Supabase, HTML/CSS',
-        desc: 'Фан-платформа и тематический форум, посвященный франшизе Sonic the Hedgehog. Проект создан для объединения сообщества, публикации актуальных новостей серии и ведения дискуссий.',
+        desc: 'Fan platform and community forum dedicated to the Sonic the Hedgehog franchise. Built to bring the community together, share latest franchise news, and host discussions.',
         features: [
-            'Управление темами, сообщениями и профилями пользователей.',
-            'Авторизация и надежная работа с базой данных на базе Supabase.',
-            'Адаптивный пользовательский интерфейс для комфортного чтения и навигации.'
+            'User profile, topic, and discussion thread management.',
+            'Authentication and resilient database backend powered by Supabase.',
+            'Responsive user interface designed for comfortable reading and community engagement.'
         ]
     },
     pixel: {
         title: 'Pixel Lab',
-        category: 'Интерактивный веб-сервис (Pixel Battle)',
+        category: 'Interactive Web Service (Pixel Battle)',
         stack: 'JavaScript / TypeScript, WebSockets, HTML5 Canvas',
-        desc: 'Платформа для проведения пиксель-батлов в реальном времени. Можно объединятся в альянсы, закрашивать пиксели на общем холсте и соревноваться за территорию.',
+        desc: 'Real-time collaborative canvas and pixel battle platform. Players can unite in alliances, paint pixels on a shared canvas, and compete for territory.',
         features: [
-            'Синхронизация действий участников на единой карте в реальном времени.',
-            'Интеграция со стрим-трансляциями для привлечения активной аудитории.',
-            'Командная механика захвата и защиты участков холста.',
-            '3D-режим холста с возможностью вращения и масштабирования для улучшенного обзора.',
+            'Real-time synchronization of player actions across a shared canvas.',
+            'Livestream integration to engage active broadcast audiences.',
+            'Team mechanics for capturing, defending, and coordinating canvas areas.',
+            'Interactive 3D canvas mode with rotation and zoom for an enhanced perspective.'
         ]
     },
     
     lumix: {
         title: 'LumixEngine2D',
-        category: '2D-игровой движок',
+        category: '2D Game Engine',
         stack: 'Rust, wgpu, LuaJIT',
-        desc: 'Низкоуровневый и производительный 2D-движок, разработанный с акцентом на скорость работы, эффективное управление ресурсами и гибкую скриптовую логику.',
+        desc: 'A low-level, high-performance 2D engine built with a focus on speed, efficient resource management, and flexible script-driven logic.',
         features: [
-            'Рендеринг с использованием графического API wgpu.',
-            'Интеграция LuaJIT для написания и быстрой отладки игровой логики.',
-            'Поддержка анимации спрайт-шитов, физических AABB-столкновений и Z-index сортировки слоев.',
-            'Динамическая загрузка текстурных ресурсов.',
-            'В будущем будет похож на UbiArt, SonicOrca'
+            'Hardware-accelerated rendering powered by the modern wgpu graphics API.',
+            'LuaJIT integration for fast script execution and rapid gameplay iteration.',
+            'Support for sprite sheet animation, AABB collision physics, and Z-index layer sorting.',
+            'Dynamic texture and asset resource loading.',
+            'Future architectural roadmap inspired by UbiArt and SonicOrca engines.'
         ]
+    },
+
+    sonic_r: {
+        title: 'Sonic R Android Port',
+        category: 'Native Game Port (Android)',
+        stack: 'C / C++, OpenGL ES 2.0, SDL2, Android NDK, Java',
+        desc: 'Native Android port and modernization of the Sonic R PC decompilation (by jnmartin84). Powered by a custom programmable OpenGL ES 2.0 shader pipeline, SDL2, and custom touch input.',
+        features: [
+            'Custom GLES 2.0 programmable shader pipeline replacing desktop OpenGL 1.x immediate mode.',
+            'Smooth 60 FPS gameplay on Android devices.',
+            'Fully customizable and draggable touch controls (D-Pad and action buttons) with real-time preview.',
+            'Storage Access Framework (SAF) asset installer for original legal PC game files.',
+            'Independent audio and SFX volume controls with persistence via SDL2_mixer.',
+            'Planned cross-platform network multiplayer powered by a Rust transport sidecar.'
+        ],
+        repo: 'https://github.com/ZinexDa/sonic-r-android'
     }
 };
 
@@ -240,7 +272,7 @@ function renderProjectDesc(key) {
 
     if (p.category) {
         html += `<div class="modal-meta-row">
-            <span class="modal-meta-label">Категория</span>
+            <span class="modal-meta-label">Category</span>
             <span class="modal-meta-value">${p.category}</span>
         </div>`;
     }
@@ -248,7 +280,7 @@ function renderProjectDesc(key) {
     if (p.stack) {
         const chips = p.stack.split(/,\s*/).map(t => `<span class="stack-chip">${t.trim()}</span>`).join('');
         html += `<div class="modal-meta-row">
-            <span class="modal-meta-label">Стек</span>
+            <span class="modal-meta-label">Stack</span>
             <span class="modal-meta-value modal-stack">${chips}</span>
         </div>`;
     }
@@ -258,11 +290,19 @@ function renderProjectDesc(key) {
     }
 
     if (p.features && p.features.length > 0) {
-        html += `<div class="modal-features-title">Функционал</div><ul class="modal-features-list">`;
+        html += `<div class="modal-features-title">Features</div><ul class="modal-features-list">`;
         p.features.forEach(f => {
             html += `<li>${f}</li>`;
         });
         html += `</ul>`;
+    }
+
+    if (p.repo) {
+        html += `<div class="modal-repo-wrapper">
+            <a href="${p.repo}" target="_blank" rel="noopener noreferrer" class="project-repo-btn">
+                <span>View on GitHub</span> ↗
+            </a>
+        </div>`;
     }
 
     bodyEl.innerHTML = html;
@@ -293,7 +333,7 @@ function selectProject(el, key) {
 
 function selectProjectById(key) {
     const items = document.querySelectorAll('.modal-project-item');
-    const keys = ['zeonix', 'sonic', 'pixel', 'lumix'];
+    const keys = ['zeonix', 'sonic', 'pixel', 'lumix', 'sonic_r'];
     items.forEach((item, i) => {
         item.classList.toggle('active', keys[i] === key);
     });
